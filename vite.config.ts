@@ -5,8 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // ON CHANGE CETTE LIGNE CI-DESSOUS POUR QUE ÇA MARCHE SUR VERCEL
-  base: "/", 
+  base: mode === "production" ? "/" : "/",
   server: {
     host: "::",
     port: 8080,
