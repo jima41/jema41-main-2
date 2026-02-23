@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Admin Store</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #D4AF37;
+            background: #16213e;
+        }
+        button {
+            background: #D4AF37;
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+        }
+        pre {
+            background: #0f3460;
+            padding: 10px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Debug Admin Store</h1>
+    
+    <div class="section">
+        <h2>Actions</h2>
+        <button onclick="clearStore()">🗑️ Clear Store</button>
+        <button onclick="checkStore()">📊 Check Store</button>
+        <button onclick="reloadPage()">🔄 Reload Page</button>
+    </div>
+
+    <div class="section">
+        <h2>Store Status</h2>
+        <pre id="status">Checking...</pre>
+    </div>
+
+    <script>
+        function clearStore() {
+            localStorage.removeItem('admin-store');
+            localStorage.removeItem('admin-store-products');
+            alert('Store cleared! Reloading...');
+            window.location.reload();
+        }
+
+        function reloadPage() {
+            window.location.reload();
+        }
+
+        function checkStore() {
+            const store = localStorage.getItem('admin-store');
+            const products = localStorage.getItem('admin-store-products');
+            
+            let status = '📍 LocalStorage Status:\n\n';
+            
+            if (store) {
+                const parsed = JSON.parse(store);
+                status += `✅ admin-store found\n`;
+                status += `   Products count: ${parsed.state?.products?.length || 0}\n`;
+                status += `   Orders count: ${parsed.state?.orders?.length || 0}\n`;
+            } else {
+                status += `❌ admin-store NOT found\n`;
+            }
+            
+            if (products) {
+                const parsed = JSON.parse(products);
+                status += `✅ admin-store-products found (${parsed.length} items)\n`;
+            } else {
+                status += `❌ admin-store-products NOT found\n`;
+            }
+            
+            status += '\n📝 Full admin-store data:\n';
+            status += store ? JSON.stringify(JSON.parse(store), null, 2) : 'Empty';
+            
+            document.getElementById('status').textContent = status;
+        }
+
+        // Auto-check on load
+        window.addEventListener('load', checkStore);
+    </script>
+</body>
+</html>

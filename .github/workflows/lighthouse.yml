@@ -1,0 +1,20 @@
+name: Lighthouse Audit (deployed site)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Lighthouse CI Action
+        uses: treosh/lighthouse-ci-action@v8
+        with:
+          urls: 'https://jima41.github.io/jema41/'
+          uploadArtifacts: true
+          json: true
+          html: true
+          performance: true
+          accessibility: true
+          best-practices: true
+          seo: true

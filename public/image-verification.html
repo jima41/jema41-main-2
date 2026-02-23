@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Verification Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        img { max-width: 100px; max-height: 100px; margin: 10px; display: inline-block; border: 2px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Image Verification Test</h1>
+    <p>This page loads the main app and checks if images are rendered.</p>
+    
+    <div id="loading">Loading app...</div>
+    <div id="results" style="display:none;"></div>
+    
+    <hr>
+    <h2>Test Results:</h2>
+    <div id="test-results"></div>
+    
+    <hr>
+    <h2>Instructions:</h2>
+    <ol>
+        <li>Wait for the app to load below</li>
+        <li>Check if you see product images (not just gray squares)</li>
+        <li>Open DevTools (F12) and check the console for image logs</li>
+        <li>Check the "Test Results" section above</li>
+    </ol>
+    
+    <script>
+        // Wait for app to load
+        setTimeout(() => {
+            const testResults = document.getElementById('test-results');
+            
+            // Test 1: Check for img elements with perfume sources
+            const perfumeImages = document.querySelectorAll('img[src*="perfume"]');
+            const test1 = perfumeImages.length > 5;
+            testResults.innerHTML += `<div class="${test1 ? 'success' : 'error'}">
+                ✅ Found ${perfumeImages.length} perfume images (expected > 5)
+            </div>`;
+            
+            // Test 2: Check image loading status
+            let loadedCount = 0;
+            perfumeImages.forEach(img => {
+                if (img.complete && img.naturalHeight > 0) {
+                    loadedCount++;
+                }
+            });
+            const test2 = loadedCount > 3;
+            testResults.innerHTML += `<div class="${test2 ? 'success' : 'error'}">
+                ✅ ${loadedCount} of ${perfumeImages.length} images fully loaded
+            </div>`;
+            
+            // Overall result
+            const allPass = test1 && test2;
+            testResults.innerHTML += `<hr><div class="${allPass ? 'success' : 'error'}" style="font-size: 20px; font-weight: bold;">
+                ${allPass ? '✅ IMAGES ARE WORKING!' : '❌ Images may not be loaded properly'}
+            </div>`;
+            
+        }, 5000); // Wait 5 seconds for app to fully load
+    </script>
+    
+    <iframe src="http://localhost:8082/jema41/" style="width: 100%; height: 800px; border: 2px solid #333; margin-top: 20px;"></iframe>
+</body>
+</html>
