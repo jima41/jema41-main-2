@@ -265,7 +265,7 @@ const DiagnosticRitual = () => {
                             Rituel de Signature
                         </span>
                         
-                        <h2 className="font-serif text-3xl md:text-5xl text-white font-normal leading-tight">
+                        <h2 className="font-serif text-3xl md:text-5xl lg:text-6xl text-white font-normal leading-tight">
                             Trouvez votre signature olfactive
                         </h2>
                         
@@ -378,7 +378,7 @@ const DiagnosticRitual = () => {
                                 Votre Signature Olfactive
                             </span>
                             
-                            <h2 className="font-serif text-2xl md:text-4xl text-white mb-1 md:mb-2 leading-tight">
+                            <h2 className="font-serif text-2xl md:text-4xl lg:text-5xl text-white mb-1 md:mb-2 leading-tight">
                                 {perfectMatch.name}
                             </h2>
                             <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] mb-3 md:mb-6">

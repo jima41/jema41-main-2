@@ -292,7 +292,7 @@ const Footer = () => {
         <p
           className="font-bold text-white whitespace-nowrap tracking-tight -mb-[0.15em]"
           style={{ 
-            fontSize: 'clamp(5rem, 16vw, 18rem)', 
+            fontSize: 'clamp(4rem, 12vw, 14rem)',
             opacity: 0.035,
             fontFamily: "'Playfair Display', 'Didot', 'Bodoni MT', 'Times New Roman', serif"
           }}

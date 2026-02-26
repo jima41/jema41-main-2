@@ -43,7 +43,7 @@ const SavoirFaireBanners = () => {
           <span className="text-[10px] md:text-xs text-[#A68A56] uppercase tracking-[0.3em] mb-3 block font-medium">
             Nos Guides
           </span>
-          <h2 className="font-serif text-2xl md:text-3xl text-[#1a1a1a]">
+          <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl text-[#1a1a1a]">
             Le Savoir-Faire Rayha
           </h2>
           <div className="h-px w-12 bg-[#D4AF37]/50 mx-auto mt-4" />
@@ -54,7 +54,7 @@ const SavoirFaireBanners = () => {
           {banners.map((banner, i) => (
             <motion.div
               key={banner.path}
-              className="relative h-[200px] sm:h-[240px] md:h-[280px] rounded-xl md:rounded-2xl overflow-hidden group"
+              className="relative h-[200px] sm:h-[240px] md:h-[280px] lg:h-[360px] xl:h-[420px] rounded-xl md:rounded-2xl overflow-hidden group"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -75,11 +75,11 @@ const SavoirFaireBanners = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
               {/* Contenu */}
-              <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8">
-                <span className="text-[9px] md:text-[10px] text-[#D4AF37] uppercase tracking-[0.3em] mb-2 block font-medium">
+              <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 lg:p-10 xl:p-12">
+                <span className="text-[10px] lg:text-xs text-[#D4AF37] uppercase tracking-[0.3em] mb-2 block font-medium">
                   {banner.tag}
                 </span>
-                <h3 className="font-serif text-xl sm:text-2xl md:text-3xl text-white mb-2 drop-shadow-lg leading-tight">
+                <h3 className="font-serif text-xl sm:text-2xl md:text-3xl lg:text-4xl text-white mb-2 drop-shadow-lg leading-tight">
                   {banner.title}
                 </h3>
                 <p className="text-xs md:text-sm text-white/70 font-light leading-relaxed mb-5 max-w-sm">

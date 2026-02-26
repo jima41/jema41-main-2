@@ -77,7 +77,7 @@ const ProductGrid = ({ onAddToCart }: ProductGridProps) => {
         {/* ── BANNIÈRE EN-TÊTE DE SECTION (Format Panoramique) ── */}
         <motion.div
           // MODIFICATION ICI : Hauteurs affinées pour un rendu "bandeau large" sur tous les écrans
-          className="relative w-full h-[150px] sm:h-[180px] md:h-[200px] lg:h-[240px] rounded-xl md:rounded-2xl overflow-hidden mb-10 md:mb-16 flex items-center justify-center group"
+          className="relative w-full h-[150px] sm:h-[180px] md:h-[200px] lg:h-[240px] xl:h-[300px] rounded-xl md:rounded-2xl overflow-hidden mb-10 md:mb-16 flex items-center justify-center group"
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
@@ -119,10 +119,10 @@ const ProductGrid = ({ onAddToCart }: ProductGridProps) => {
               }
             }}
           >
-            <span className="text-[9px] md:text-[10px] lg:text-xs text-[#D4AF37] uppercase tracking-[0.3em] mb-1.5 md:mb-2 block font-medium">
+            <span className="text-[10px] lg:text-xs text-[#D4AF37] uppercase tracking-[0.3em] mb-1.5 md:mb-2 block font-medium">
               Découvrez
             </span>
-            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal mb-1.5 md:mb-3 text-white drop-shadow-lg">
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal mb-1.5 md:mb-3 text-white drop-shadow-lg">
               Notre Collection
             </h2>
             <div className="h-px w-12 md:w-16 bg-[#D4AF37] mb-2 md:mb-3 opacity-70" />
@@ -138,7 +138,7 @@ const ProductGrid = ({ onAddToCart }: ProductGridProps) => {
 
         {/* Product Grid — stagger whileInView */}
         <motion.div
-          className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5"
+          className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 lg:gap-6"
           variants={staggerContainerVariants}
           initial="hidden"
           whileInView="visible"

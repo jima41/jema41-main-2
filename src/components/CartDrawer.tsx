@@ -123,7 +123,7 @@ const CartDrawer = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: 
       />
 
       {/* Tiroir du panier (Adapté Mobile & Desktop) */}
-      <div className="fixed z-50 right-0 top-0 h-full w-[90vw] max-w-md bg-[#0E0E0E] text-white flex flex-col shadow-2xl border-l border-white/10 slide-in-right">
+      <div className="fixed z-50 right-0 top-0 h-full w-[90vw] max-w-md lg:max-w-[520px] bg-[#0E0E0E] text-white flex flex-col shadow-2xl border-l border-white/10 slide-in-right">
         
         {/* En-tête */}
         <div className="flex items-center justify-between p-5 md:p-6 border-b border-white/10 sticky top-0 z-10 bg-[#0E0E0E]/95 backdrop-blur-md">
