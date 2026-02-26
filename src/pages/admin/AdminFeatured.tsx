@@ -19,7 +19,11 @@ const AdminFeatured = () => {
     }
   }, [user, navigate]);
 
-  return <FeaturedProductsManager />;
+  return (
+    <div className="space-y-6">
+      <FeaturedProductsManager />
+    </div>
+  );
 };
 
 export default AdminFeatured;

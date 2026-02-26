@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingBag, Heart } from 'lucide-react';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
@@ -50,19 +50,16 @@ const ProductCard = ({
 }: ProductCardProps) => {
   const navigate = useNavigate();
   const isOutOfStock = stock === 0;
-  const [isFaved, setIsFaved] = useState(false);
-  const { toggleFavorite, isFavorite } = useFavoritesStore();
-  const { user } = useAuth();
+  const favorites = useFavoritesStore(state => state.favorites);
+  const toggleFavorite = useFavoritesStore(state => state.toggleFavorite);
+  const { userId } = useAuth();
+  const isFaved = favorites.includes(id);
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development' && !image) {
       console.debug(`⚠️ ProductCard ${name} has no image`);
     }
   }, [id, name, image]);
-
-  useEffect(() => {
-    setIsFaved(isFavorite(id));
-  }, [id, isFavorite]);
 
   const validFamilies = (families || []).filter((f) => VALID_FAMILIES.includes(f));
   const computedTopFamilies = getTopFamilies(
@@ -75,9 +72,8 @@ const ProductCard = ({
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!user?.id) return;
-    toggleFavorite(user.id, id);
-    setIsFaved(!isFaved);
+    if (!userId) return;
+    toggleFavorite(userId, id);
   };
 
   const scentLine = computedTopFamilies.length > 0
@@ -162,7 +158,7 @@ const ProductCard = ({
             e.stopPropagation();
             handleToggleFavorite(e);
           }}
-          className="absolute top-2.5 right-2.5 p-2 rounded-full bg-black/35 backdrop-blur-sm z-10 active:scale-95"
+          className="absolute top-2.5 right-2.5 p-2 rounded-full bg-black/35 backdrop-blur-sm z-30 active:scale-95"
           whileHover={{ scale: 1.12 }}
           whileTap={{ scale: 0.88 }}
           transition={{ type: 'spring', stiffness: 400, damping: 30 }}
@@ -171,7 +167,7 @@ const ProductCard = ({
           <Heart
             strokeWidth={2}
             className={`w-4 h-4 transition-all duration-300 ${
-              isFaved ? 'fill-red-500 text-red-500' : 'text-white/80 hover:text-[#D4AF37]'
+              isFaved ? 'fill-[#D4AF37] text-[#D4AF37]' : 'text-white/80 hover:text-[#D4AF37]'
             }`}
           />
         </motion.button>

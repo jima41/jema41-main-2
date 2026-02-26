@@ -560,6 +560,50 @@ export async function removeFromCart(cartItemId: string): Promise<void> {
 }
 
 /**
+ * Met à jour les données produit dans tous les paniers contenant ce produit.
+ * Appelé automatiquement quand un produit est modifié dans l'admin.
+ */
+export async function updateCartItemsByProductId(
+  productId: string,
+  updates: {
+    product_name?:     string;
+    product_price?:    number;
+    product_brand?:    string;
+    product_image?:    string | null;
+    product_scent?:    string | null;
+    product_category?: string | null;
+  }
+): Promise<void> {
+  try {
+    if (Object.keys(updates).length === 0) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
+      .from('cart_items')
+      .update(updates)
+      .eq('product_id', productId);
+    if (error) throw error;
+  } catch (error) {
+    console.error('❌ Erreur updateCartItemsByProductId:', error);
+  }
+}
+
+/**
+ * Supprime ce produit de tous les paniers (ex : stock tombé à 0).
+ */
+export async function removeCartItemsByProductId(productId: string): Promise<void> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
+      .from('cart_items')
+      .delete()
+      .eq('product_id', productId);
+    if (error) throw error;
+  } catch (error) {
+    console.error('❌ Erreur removeCartItemsByProductId:', error);
+  }
+}
+
+/**
  * Vide complètement le panier d'un utilisateur
  */
 export async function clearCart(userId: string): Promise<void> {
@@ -1058,6 +1102,106 @@ export async function deleteOlfactoryNote(id: string): Promise<void> {
   }
 }
 
+// ============================================================================
+// PROMO CODES — CRUD Supabase
+// ============================================================================
+
+export interface PromoCodeRow {
+  id: string;
+  code: string;
+  discount_percent: number;
+  is_active: boolean;
+  usage_count: number;
+  created_at: string;
+  min_amount: number;
+  single_use: boolean;
+  free_shipping:      boolean;
+  free_product_id:    string | null;
+  free_product_label: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const promoCodesTable = () => (supabase as any).from('promo_codes');
+
+export async function getAllPromoCodes(): Promise<PromoCodeRow[]> {
+  try {
+    const { data, error } = await promoCodesTable()
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw SupabaseError.fromError(error, 'getAllPromoCodes');
+    return (data || []) as PromoCodeRow[];
+  } catch (error) {
+    console.error('❌ Erreur getAllPromoCodes:', error);
+    throw SupabaseError.fromError(error, 'getAllPromoCodes');
+  }
+}
+
+export async function createPromoCode(promo: {
+  code: string;
+  discount: number;
+  is_active?: boolean;
+  min_amount?: number;
+  single_use?: boolean;
+  free_shipping?: boolean;
+  free_product_id?:    string | null;
+  free_product_label?: string;
+}): Promise<PromoCodeRow> {
+  try {
+    const { data, error } = await promoCodesTable()
+      .insert([{
+        code: promo.code,
+        discount_percent:  promo.discount,
+        is_active:         promo.is_active ?? true,
+        min_amount:        promo.min_amount ?? 0,
+        single_use:        promo.single_use ?? false,
+        free_shipping:     promo.free_shipping ?? false,
+        free_product_id:   promo.free_product_id ?? null,
+        free_product_label: promo.free_product_label ?? 'Produit offert',
+      }])
+      .select()
+      .single();
+
+    if (error) throw SupabaseError.fromError(error, 'createPromoCode');
+    return data as PromoCodeRow;
+  } catch (error) {
+    console.error('❌ Erreur createPromoCode:', error);
+    throw SupabaseError.fromError(error, 'createPromoCode');
+  }
+}
+
+export async function updatePromoCode(
+  id: string,
+  updates: { is_active?: boolean; usage_count?: number }
+): Promise<PromoCodeRow> {
+  try {
+    const { data, error } = await promoCodesTable()
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw SupabaseError.fromError(error, 'updatePromoCode');
+    return data as PromoCodeRow;
+  } catch (error) {
+    console.error('❌ Erreur updatePromoCode:', error);
+    throw SupabaseError.fromError(error, 'updatePromoCode');
+  }
+}
+
+export async function deletePromoCode(id: string): Promise<void> {
+  try {
+    const { error } = await promoCodesTable()
+      .delete()
+      .eq('id', id);
+
+    if (error) throw SupabaseError.fromError(error, 'deletePromoCode');
+  } catch (error) {
+    console.error('❌ Erreur deletePromoCode:', error);
+    throw SupabaseError.fromError(error, 'deletePromoCode');
+  }
+}
+
 /**
  * Upload une image vers Supabase Storage
  * @param file Le fichier image à uploader
@@ -1263,6 +1407,224 @@ export async function createStorageBucket(bucketName: string, isPublic: boolean 
   } catch (error) {
     console.error('❌ Erreur lors de la création du bucket:', error);
     throw error;
+  }
+}
+
+// ============================================================================
+// ORDERS — CRUD Supabase
+// ============================================================================
+
+export interface OrderRow {
+  id: string;
+  reference: string | null;
+  user_id: string | null;
+  user_name: string | null;
+  user_email: string | null;
+  items: any;
+  total_amount: number;
+  shipping_address: any | null;
+  status: string;
+  timestamp: number;
+  pending_at: number | null;
+  confirmed_at: number | null;
+  shipped_at: number | null;
+  delivered_at: number | null;
+  notes: string | null;
+  promo_code: string | null;
+  promo_discount: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ordersTable = () => (supabase as any).from('orders');
+
+export async function fetchAllOrders(): Promise<OrderRow[]> {
+  try {
+    const { data, error } = await ordersTable()
+      .select('*')
+      .order('timestamp', { ascending: false });
+
+    if (error) throw SupabaseError.fromError(error, 'fetchAllOrders');
+    return (data || []) as OrderRow[];
+  } catch (error) {
+    console.error('❌ Erreur fetchAllOrders:', error);
+    throw SupabaseError.fromError(error, 'fetchAllOrders');
+  }
+}
+
+export async function insertOrder(order: {
+  id: string;
+  reference?: string;
+  userId?: string;
+  userName?: string;
+  userEmail?: string;
+  items: any[];
+  totalAmount: number;
+  shippingAddress?: any;
+  status: string;
+  timestamp: number;
+  pendingAt?: number;
+  notes?: string;
+  promoCode?: string;
+  promoDiscount?: number;
+}): Promise<OrderRow> {
+  try {
+    const { data, error } = await ordersTable()
+      .insert([{
+        id: order.id,
+        reference: order.reference ?? null,
+        user_id: order.userId ?? null,
+        user_name: order.userName ?? null,
+        user_email: order.userEmail ?? null,
+        items: order.items,
+        total_amount: order.totalAmount,
+        shipping_address: order.shippingAddress ?? null,
+        status: order.status,
+        timestamp: order.timestamp,
+        pending_at: order.pendingAt ?? null,
+        notes: order.notes ?? null,
+        promo_code: order.promoCode ?? null,
+        promo_discount: order.promoDiscount ?? null,
+      }])
+      .select()
+      .single();
+
+    if (error) throw SupabaseError.fromError(error, 'insertOrder');
+    console.log('✅ Commande enregistrée en base:', order.id);
+    return data as OrderRow;
+  } catch (error) {
+    console.error('❌ Erreur insertOrder:', error);
+    throw SupabaseError.fromError(error, 'insertOrder');
+  }
+}
+
+export async function updateOrderStatusInDB(
+  orderId: string,
+  status: string,
+  timestamps: { confirmed_at?: number; shipped_at?: number; delivered_at?: number }
+): Promise<void> {
+  try {
+    const updates: any = { status };
+    if (timestamps.confirmed_at) updates.confirmed_at = timestamps.confirmed_at;
+    if (timestamps.shipped_at)   updates.shipped_at   = timestamps.shipped_at;
+    if (timestamps.delivered_at) updates.delivered_at = timestamps.delivered_at;
+
+    const { error } = await ordersTable().update(updates).eq('id', orderId);
+    if (error) throw SupabaseError.fromError(error, `updateOrderStatusInDB: ${orderId}`);
+    console.log('✅ Statut commande mis à jour en base:', orderId, '→', status);
+  } catch (error) {
+    console.error('❌ Erreur updateOrderStatusInDB:', error);
+    throw SupabaseError.fromError(error, `updateOrderStatusInDB: ${orderId}`);
+  }
+}
+
+export async function deleteOrderFromDB(orderId: string): Promise<void> {
+  try {
+    const { error } = await ordersTable().delete().eq('id', orderId);
+    if (error) throw SupabaseError.fromError(error, `deleteOrderFromDB: ${orderId}`);
+    console.log('✅ Commande supprimée de la base:', orderId);
+  } catch (error) {
+    console.error('❌ Erreur deleteOrderFromDB:', error);
+    throw SupabaseError.fromError(error, `deleteOrderFromDB: ${orderId}`);
+  }
+}
+
+// ============================================================================
+// ABANDONED CARTS — CRUD Supabase
+// ============================================================================
+
+export interface AbandonedCartRow {
+  id: string;
+  client_id: string | null;
+  client_name: string | null;
+  client_email: string | null;
+  items: any;
+  total_value: number;
+  abandoned_at: number;
+  recovery_attempts: number;
+  last_recovery_email: number | null;
+  recovered: boolean;
+  recovery_date: number | null;
+  discount_offered: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const abandonedCartsTable = () => (supabase as any).from('abandoned_carts');
+
+export async function fetchAllAbandonedCarts(): Promise<AbandonedCartRow[]> {
+  try {
+    const { data, error } = await abandonedCartsTable()
+      .select('*')
+      .order('abandoned_at', { ascending: false });
+
+    if (error) throw SupabaseError.fromError(error, 'fetchAllAbandonedCarts');
+    return (data || []) as AbandonedCartRow[];
+  } catch (error) {
+    console.error('❌ Erreur fetchAllAbandonedCarts:', error);
+    throw SupabaseError.fromError(error, 'fetchAllAbandonedCarts');
+  }
+}
+
+export async function upsertAbandonedCart(cart: {
+  id: string;
+  clientId?: string;
+  clientName?: string;
+  clientEmail?: string;
+  items: any[];
+  totalValue: number;
+  abandonedAt: number;
+  recoveryAttempts?: number;
+  lastRecoveryEmail?: number;
+  recovered?: boolean;
+  recoveryDate?: number;
+  discountOffered?: number;
+}): Promise<void> {
+  try {
+    const { error } = await abandonedCartsTable().upsert(
+      [{
+        id:                   cart.id,
+        client_id:            cart.clientId            ?? null,
+        client_name:          cart.clientName          ?? null,
+        client_email:         cart.clientEmail         ?? null,
+        items:                cart.items,
+        total_value:          cart.totalValue,
+        abandoned_at:         cart.abandonedAt,
+        recovery_attempts:    cart.recoveryAttempts    ?? 0,
+        last_recovery_email:  cart.lastRecoveryEmail   ?? null,
+        recovered:            cart.recovered           ?? false,
+        recovery_date:        cart.recoveryDate        ?? null,
+        discount_offered:     cart.discountOffered     ?? null,
+      }],
+      { onConflict: 'id' }
+    );
+    if (error) throw SupabaseError.fromError(error, 'upsertAbandonedCart');
+  } catch (error) {
+    console.error('❌ Erreur upsertAbandonedCart:', error);
+    throw SupabaseError.fromError(error, 'upsertAbandonedCart');
+  }
+}
+
+export async function updateAbandonedCartInDB(
+  cartId: string,
+  updates: {
+    recovery_attempts?:   number;
+    last_recovery_email?: number;
+    discount_offered?:    number;
+    recovered?:           boolean;
+    recovery_date?:       number;
+  }
+): Promise<void> {
+  try {
+    const { error } = await abandonedCartsTable()
+      .update(updates)
+      .eq('id', cartId);
+    if (error) throw SupabaseError.fromError(error, 'updateAbandonedCartInDB');
+  } catch (error) {
+    console.error('❌ Erreur updateAbandonedCartInDB:', error);
+    throw SupabaseError.fromError(error, 'updateAbandonedCartInDB');
   }
 }
 

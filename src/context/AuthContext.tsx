@@ -325,7 +325,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         // Si l'email doit être confirmé
         if (data?.user && !data?.session) {
-          throw new Error('Un email de confirmation vous a été envoyé. Vérifiez votre boîte mail.');
+          throw new Error('CONFIRM:Un email de confirmation vous a été envoyé. Vérifiez votre boîte mail.');
         }
 
         // Si l'inscription connecte directement (email confirmation désactivée)

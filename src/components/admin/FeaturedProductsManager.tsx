@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GripVertical, Check, X, ArrowUp, ArrowDown, Plus, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useAdminProducts } from '@/store/useAdminStore';
 import { useFeaturedProducts } from '@/store/useAdminStore';
 import type { Product } from '@/store/useAdminStore';
@@ -82,10 +81,10 @@ const FeaturedProductsManager = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-serif text-3xl font-normal mb-2 text-admin-text-primary">
-          Gérer Notre Sélection
+        <h1 className="text-3xl font-bold text-admin-text-primary font-montserrat tracking-tighter">
+          Notre Sélection
         </h1>
-        <p className="text-admin-text-secondary text-sm">
+        <p className="text-admin-text-secondary mt-1">
           Sélectionnez les produits et réorganisez-les par glisser-déposer
         </p>
       </div>
@@ -235,28 +234,27 @@ const FeaturedProductsManager = () => {
 
       {/* Action Buttons */}
       <div className="flex gap-3 justify-end pt-4 border-t border-admin-border/20">
-        <Button
+        <button
           onClick={handleCancel}
           disabled={!hasChanges}
-          variant="outline"
-          className="border-admin-border/40 hover:border-admin-border/60"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-admin-border text-admin-text-secondary text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Annuler
-        </Button>
-        <Button
+        </button>
+        <button
           onClick={handleSave}
           disabled={!hasChanges || isSaving}
-          className="bg-gradient-to-r from-admin-gold/20 to-admin-gold/10 hover:from-admin-gold/30 hover:to-admin-gold/20 border border-admin-gold/40 text-admin-gold hover:text-admin-gold disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-admin-gold/10 hover:bg-admin-gold/20 border border-admin-gold/30 hover:border-admin-gold/60 text-admin-gold text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isSaving ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin" />
               Sauvegarde...
             </>
           ) : (
             'Enregistrer les modifications'
           )}
-        </Button>
+        </button>
       </div>
     </div>
   );

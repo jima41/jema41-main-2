@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { BarChart3, Package, Users, ShoppingCart, ChevronRight, LineChart, Heart, Sparkles, TrendingDown, TicketPercent, Flower2, Brain } from 'lucide-react';
+import { BarChart3, Package, Users, ShoppingCart, ChevronRight, LineChart, Heart, Sparkles, TrendingDown, TicketPercent, Flower2, Brain, Layers } from 'lucide-react';
 
 interface AdminSidebarProps {
   onItemClick?: () => void;
@@ -76,6 +76,12 @@ const AdminSidebar = ({ onItemClick }: AdminSidebarProps) => {
       icon: Brain,
       path: '/admin/scent-id',
       description: 'Profils olfactifs',
+    },
+    {
+      label: "L'Art de Combiner",
+      icon: Layers,
+      path: '/admin/layering',
+      description: 'Accords signatures',
     },
   ];
 

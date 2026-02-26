@@ -145,14 +145,18 @@ export const useOlfactoryNotesStore = create<OlfactoryNotesState>()(
         try {
           const rows = await getAllOlfactoryNotes();
           if (rows && rows.length > 0) {
-            const mapped = rows.map(serverRowToNote);
-            set({ notes: mapped });
-            console.log(`🌿 Notes olfactives chargées depuis Supabase: ${mapped.length}`);
+            const serverNotes = rows.map(serverRowToNote);
+            const serverIds = new Set(serverNotes.map(n => n.id));
+            // Conserver les notes locales non présentes sur le serveur
+            const localOnly = get().notes.filter(n => !serverIds.has(n.id));
+            set({ notes: [...serverNotes, ...localOnly] });
+            console.log(`🌿 Notes olfactives chargées depuis Supabase: ${serverNotes.length}`);
           } else {
             console.log('🌿 Aucune note serveur trouvée — utilisation des valeurs par défaut');
           }
         } catch (error) {
-          console.error('❌ Erreur initializeNotes:', error);
+          // Table manquante ou erreur réseau → on reste sur les valeurs par défaut du localStorage
+          console.warn('⚠️ Notes olfactives non chargées depuis Supabase (table manquante ?):', error);
         }
       },
 
@@ -180,9 +184,8 @@ export const useOlfactoryNotesStore = create<OlfactoryNotesState>()(
             notes: state.notes.map(n => n.id === tempId ? serverRowToNote(created) : n),
           }));
         } catch (error) {
-          console.error('❌ Erreur createOlfactoryNote:', error);
-          // rollback
-          set(state => ({ notes: state.notes.filter(n => n.id !== tempId) }));
+          console.error('❌ Erreur createOlfactoryNote (note conservée localement):', error);
+          // Pas de rollback : la note reste sauvegardée en localStorage via persist
         }
       },
 

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useCartStore } from '@/store/useCartStore';
 import { usePromoCodesStore } from '@/store/usePromoCodesStore';
+import { useOlfactoryNotesStore } from '@/store/useOlfactoryNotesStore';
 import { useToast } from '@/hooks/use-toast';
 
 /**
@@ -20,6 +21,8 @@ export function DataSyncInitializer({ children }: { children: React.ReactNode })
   const appliedPromoCode = useCartStore((state) => state.promoCode);
   const clearPromoCode = useCartStore((state) => state.clearPromoCode);
   const promoCodes = usePromoCodesStore((state) => state.promoCodes);
+  const initializePromoCodes = usePromoCodesStore((state) => state.initializePromoCodes);
+  const initializeNotes = useOlfactoryNotesStore((state) => state.initializeNotes);
   const { toast } = useToast();
 
   // Log statut uniquement lorsqu'il y a un changement significatif
@@ -30,6 +33,12 @@ export function DataSyncInitializer({ children }: { children: React.ReactNode })
   useEffect(() => {
     console.log('🟢 [DataSyncInitializer] STATUS', { isInitialized, productsLoading, productsCount: products.length });
   }, [isInitialized, productsLoading, products.length]);
+
+  // Chargement des codes promo et notes olfactives depuis Supabase au démarrage
+  useEffect(() => {
+    initializePromoCodes();
+    initializeNotes();
+  }, []);
 
   // Initialisation des produits au montage du composant
   useEffect(() => {

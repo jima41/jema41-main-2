@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ShoppingBag, Heart, ChevronLeft, ChevronRight, Minus, Plus, ChevronDown } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Heart, ChevronLeft, ChevronRight, Minus, Plus, ChevronDown, BookOpen, Layers, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
@@ -89,7 +89,7 @@ const ProductDetail = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [quantity, setQuantity] = useState(1);
   
-  const [openAccordions, setOpenAccordions] = useState<string[]>(['notes', 'details']);
+  const [openAccordions, setOpenAccordions] = useState<string[]>(['notes']);
 
   const toggleAccordion = (id: string) => {
     setOpenAccordions((prev) => 
@@ -322,13 +322,20 @@ const ProductDetail = () => {
                   )}
                 </div>
 
-                <div className="flex items-center justify-center md:justify-start gap-4">
-                  <span className="text-2xl lg:text-3xl font-sans font-medium tracking-wide text-[#1a1a1a] tabular-nums">
-                    {price.toFixed(2)} €
-                  </span>
-                  {!isOutOfStock && stock > 0 && stock < 5 && (
-                    <span className="text-[9px] uppercase tracking-[0.2em] text-[#0E0E0E] font-bold bg-[#A68A56] px-2.5 py-1 rounded-sm">
-                      Stock limité
+                <div className="flex flex-col items-center md:items-start gap-1">
+                  <div className="flex items-center gap-4">
+                    <span className="text-2xl lg:text-3xl font-sans font-medium tracking-wide text-[#1a1a1a] tabular-nums">
+                      {price.toFixed(2)} €
+                    </span>
+                    {!isOutOfStock && stock > 0 && stock < 5 && (
+                      <span className="text-[9px] uppercase tracking-[0.2em] text-[#0E0E0E] font-bold bg-[#A68A56] px-2.5 py-1 rounded-sm">
+                        Stock limité
+                      </span>
+                    )}
+                  </div>
+                  {(product.volume || storeProduct?.volume) && (
+                    <span className="text-sm text-[#1a1a1a]/40 italic font-light">
+                      {storeProduct?.volume || product.volume}
                     </span>
                   )}
                 </div>
@@ -455,10 +462,10 @@ const ProductDetail = () => {
                   </div>
                 </AccordionItem>
 
-                <AccordionItem 
-                  title="Livraison & Retours" 
+                <AccordionItem
+                  title="Livraison & Retours"
                   id="livraison"
-                  isOpen={openAccordions.includes('livraison')} 
+                  isOpen={openAccordions.includes('livraison')}
                   onToggle={toggleAccordion}
                 >
                   <ul className="space-y-3">
@@ -475,6 +482,39 @@ const ProductDetail = () => {
                       <span className="text-sm">Retours gratuits sous 30 jours si le flacon est scellé.</span>
                     </li>
                   </ul>
+                </AccordionItem>
+              </div>
+
+              {/* ── NOS GUIDES (Accordéon) ── */}
+              <div className="border-t border-[#EAEAEA] mt-0">
+                <AccordionItem
+                  title="Nos Guides"
+                  id="guides"
+                  isOpen={openAccordions.includes('guides')}
+                  onToggle={toggleAccordion}
+                >
+                  <div className="space-y-2 pt-1">
+                    <button
+                      onClick={() => navigate('/art-de-se-parfumer')}
+                      className="w-full flex items-center justify-between px-4 py-3.5 rounded-lg border border-[#EAEAEA] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all duration-200 group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <BookOpen className="w-4 h-4 text-[#A68A56]" />
+                        <span className="text-sm text-[#1a1a1a]/70 group-hover:text-[#1a1a1a] transition-colors">L'Art de se Parfumer</span>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-[#1a1a1a]/30 group-hover:text-[#D4AF37] group-hover:translate-x-0.5 transition-all duration-200" />
+                    </button>
+                    <button
+                      onClick={() => navigate('/art-du-layering')}
+                      className="w-full flex items-center justify-between px-4 py-3.5 rounded-lg border border-[#EAEAEA] hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/5 transition-all duration-200 group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Layers className="w-4 h-4 text-[#A68A56]" />
+                        <span className="text-sm text-[#1a1a1a]/70 group-hover:text-[#1a1a1a] transition-colors">L'Art de Combiner</span>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-[#1a1a1a]/30 group-hover:text-[#D4AF37] group-hover:translate-x-0.5 transition-all duration-200" />
+                    </button>
+                  </div>
                 </AccordionItem>
               </div>
 

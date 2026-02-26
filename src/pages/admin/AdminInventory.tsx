@@ -8,7 +8,6 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useAuth } from '@/context/AuthContext';
 import { AlertCircle, TrendingUp, Package, RotateCcw, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 const AdminInventory = () => {
   try {
@@ -109,36 +108,35 @@ const AdminInventory = () => {
           <h1 className="text-3xl font-bold text-admin-text-primary font-montserrat tracking-tighter">
             Gestion Inventaire
           </h1>
-          <p className="text-admin-text-secondary mt-2">
+          <p className="text-admin-text-secondary mt-1">
             Monitoring des stocks et vélocité des ventes
           </p>
         </div>
         <div className="flex gap-3">
-          <Button
+          <button
             onClick={handleAddProduct}
-            className="bg-gradient-to-r from-amber-400 to-amber-500 text-black hover:from-amber-300 hover:to-amber-400 font-semibold h-fit"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-admin-gold/10 hover:bg-admin-gold/20 border border-admin-gold/30 hover:border-admin-gold/60 text-admin-gold text-sm font-medium transition-all"
           >
-            <Plus className="w-5 h-5 mr-2" />
+            <Plus className="w-4 h-4" />
             Ajouter un Parfum
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={handleResetToDefaults}
-            variant="outline"
-            className="border-admin-border text-admin-text-secondary hover:text-amber-400 hover:border-amber-400/50 h-fit"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-admin-border hover:border-admin-border/80 text-admin-text-secondary text-sm font-medium transition-all"
           >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Réinitialiser Défauts
-          </Button>
+            <RotateCcw className="w-4 h-4" />
+            Réinitialiser
+          </button>
         </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Total Stock Card */}
-        <div className="glass-panel border border-admin-border rounded-lg p-6 hover:shadow-glass-gold transition-all">
+        <div className="glass-panel border border-admin-border rounded-xl p-4 transition-all">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm font-medium text-admin-text-secondary uppercase tracking-wide mb-2">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-admin-text-secondary/60 mb-2">
                 Stock Total
               </p>
               <p className="text-3xl font-bold text-admin-text-primary font-montserrat">
@@ -155,10 +153,10 @@ const AdminInventory = () => {
         </div>
 
         {/* Critical Stock Card */}
-        <div className="glass-panel border border-admin-border rounded-lg p-6 hover:shadow-glass-gold transition-all">
+        <div className="glass-panel border border-admin-border rounded-xl p-4 transition-all">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm font-medium text-admin-text-secondary uppercase tracking-wide mb-2">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-admin-text-secondary/60 mb-2">
                 Stock Critique
               </p>
               <p className="text-3xl font-bold text-red-400 font-montserrat">
@@ -175,10 +173,10 @@ const AdminInventory = () => {
         </div>
 
         {/* Low Stock Card */}
-        <div className="glass-panel border border-admin-border rounded-lg p-6 hover:shadow-glass-gold transition-all">
+        <div className="glass-panel border border-admin-border rounded-xl p-4 transition-all">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm font-medium text-admin-text-secondary uppercase tracking-wide mb-2">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-admin-text-secondary/60 mb-2">
                 Stock Faible
               </p>
               <p className="text-3xl font-bold text-amber-400 font-montserrat">

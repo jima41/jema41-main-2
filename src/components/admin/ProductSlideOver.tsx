@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { X, ChevronDown, Search, Loader2, Upload, Camera, CheckCircle, AlertCircle } from 'lucide-react';
+import { X, ChevronDown, Search, Loader2, Upload, Camera, CheckCircle, AlertCircle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,7 +32,7 @@ export const ProductSlideOver: React.FC<ProductSlideOverProps> = ({
   const { addProduct, updateProduct } = useAdminStore();
   const { toast } = useToast();
   const { handleError, handleSuccess } = useSupabaseErrorHandler();
-  const { notes: allOlfactoryNotes, getNotesByPyramid } = useOlfactoryNotesStore();
+  const { notes: allOlfactoryNotes, getNotesByPyramid, addNote: addOlfactoryNote } = useOlfactoryNotesStore();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -285,6 +285,11 @@ export const ProductSlideOver: React.FC<ProductSlideOverProps> = ({
     fond: '',
   });
   const [openDropdowns, setOpenDropdowns] = useState({
+    tete: false,
+    coeur: false,
+    fond: false,
+  });
+  const [addingNote, setAddingNote] = useState({
     tete: false,
     coeur: false,
     fond: false,
@@ -550,7 +555,7 @@ export const ProductSlideOver: React.FC<ProductSlideOverProps> = ({
                     <Search className="w-4 h-4 text-admin-text-secondary" />
                     <input
                       type="text"
-                      placeholder="Rechercher..."
+                      placeholder="Rechercher ou créer..."
                       value={searchQueries.tete}
                       onChange={(e) => setSearchQueries({ ...searchQueries, tete: e.target.value })}
                       className="bg-transparent text-admin-text-primary text-xs outline-none flex-1"
@@ -578,6 +583,23 @@ export const ProductSlideOver: React.FC<ProductSlideOverProps> = ({
                       {formData.notes_tete.includes(note.label) ? '✓ ' : '  '}{note.label}
                     </button>
                   ))}
+                  {searchQueries.tete.trim() && !getNotesByPyramid('tete').some(n => n.label.toLowerCase() === searchQueries.tete.trim().toLowerCase()) && (
+                    <button
+                      disabled={addingNote.tete}
+                      onClick={async () => {
+                        const label = searchQueries.tete.trim();
+                        setAddingNote(s => ({ ...s, tete: true }));
+                        await addOlfactoryNote(label, 'tete', 'Floral');
+                        setFormData(prev => ({ ...prev, notes_tete: prev.notes_tete.includes(label) ? prev.notes_tete : [...prev.notes_tete, label] }));
+                        setSearchQueries(prev => ({ ...prev, tete: '' }));
+                        setAddingNote(s => ({ ...s, tete: false }));
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm text-amber-400 hover:bg-amber-500/10 border-t border-admin-border flex items-center gap-2 disabled:opacity-50"
+                    >
+                      <Plus className="w-3 h-3" />
+                      Créer «{searchQueries.tete.trim()}» en Note de Tête
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -622,7 +644,7 @@ export const ProductSlideOver: React.FC<ProductSlideOverProps> = ({
                     <Search className="w-4 h-4 text-admin-text-secondary" />
                     <input
                       type="text"
-                      placeholder="Rechercher..."
+                      placeholder="Rechercher ou créer..."
                       value={searchQueries.coeur}
                       onChange={(e) => setSearchQueries({ ...searchQueries, coeur: e.target.value })}
                       className="bg-transparent text-admin-text-primary text-xs outline-none flex-1"
@@ -650,6 +672,23 @@ export const ProductSlideOver: React.FC<ProductSlideOverProps> = ({
                       {formData.notes_coeur.includes(note.label) ? '✓ ' : '  '}{note.label}
                     </button>
                   ))}
+                  {searchQueries.coeur.trim() && !getNotesByPyramid('coeur').some(n => n.label.toLowerCase() === searchQueries.coeur.trim().toLowerCase()) && (
+                    <button
+                      disabled={addingNote.coeur}
+                      onClick={async () => {
+                        const label = searchQueries.coeur.trim();
+                        setAddingNote(s => ({ ...s, coeur: true }));
+                        await addOlfactoryNote(label, 'coeur', 'Floral');
+                        setFormData(prev => ({ ...prev, notes_coeur: prev.notes_coeur.includes(label) ? prev.notes_coeur : [...prev.notes_coeur, label] }));
+                        setSearchQueries(prev => ({ ...prev, coeur: '' }));
+                        setAddingNote(s => ({ ...s, coeur: false }));
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm text-amber-400 hover:bg-amber-500/10 border-t border-admin-border flex items-center gap-2 disabled:opacity-50"
+                    >
+                      <Plus className="w-3 h-3" />
+                      Créer «{searchQueries.coeur.trim()}» en Note de Cœur
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -694,7 +733,7 @@ export const ProductSlideOver: React.FC<ProductSlideOverProps> = ({
                     <Search className="w-4 h-4 text-admin-text-secondary" />
                     <input
                       type="text"
-                      placeholder="Rechercher..."
+                      placeholder="Rechercher ou créer..."
                       value={searchQueries.fond}
                       onChange={(e) => setSearchQueries({ ...searchQueries, fond: e.target.value })}
                       className="bg-transparent text-admin-text-primary text-xs outline-none flex-1"
@@ -722,6 +761,23 @@ export const ProductSlideOver: React.FC<ProductSlideOverProps> = ({
                       {formData.notes_fond.includes(note.label) ? '✓ ' : '  '}{note.label}
                     </button>
                   ))}
+                  {searchQueries.fond.trim() && !getNotesByPyramid('fond').some(n => n.label.toLowerCase() === searchQueries.fond.trim().toLowerCase()) && (
+                    <button
+                      disabled={addingNote.fond}
+                      onClick={async () => {
+                        const label = searchQueries.fond.trim();
+                        setAddingNote(s => ({ ...s, fond: true }));
+                        await addOlfactoryNote(label, 'fond', 'Boisé');
+                        setFormData(prev => ({ ...prev, notes_fond: prev.notes_fond.includes(label) ? prev.notes_fond : [...prev.notes_fond, label] }));
+                        setSearchQueries(prev => ({ ...prev, fond: '' }));
+                        setAddingNote(s => ({ ...s, fond: false }));
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm text-amber-400 hover:bg-amber-500/10 border-t border-admin-border flex items-center gap-2 disabled:opacity-50"
+                    >
+                      <Plus className="w-3 h-3" />
+                      Créer «{searchQueries.fond.trim()}» en Note de Fond
+                    </button>
+                  )}
                 </div>
               </div>
             )}

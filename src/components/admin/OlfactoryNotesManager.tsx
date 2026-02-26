@@ -1,9 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Plus, Trash2, Search, Droplets, Heart, Anchor, Pencil, Check, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import {
   useOlfactoryNotesStore,
   OLFACTORY_FAMILIES,
@@ -44,7 +43,12 @@ interface EditState {
 }
 
 const OlfactoryNotesManager: React.FC = () => {
-  const { notes, addNote, removeNote, updateNote } = useOlfactoryNotesStore();
+  const { notes, addNote, removeNote, updateNote, initializeNotes } = useOlfactoryNotesStore();
+
+  // Charger les notes depuis Supabase à chaque ouverture de la page
+  useEffect(() => {
+    initializeNotes();
+  }, []);
 
   const [activeTab, setActiveTab] = useState<PyramidKey>('tete');
   const [newNoteLabel, setNewNoteLabel] = useState('');
@@ -232,12 +236,12 @@ const OlfactoryNotesManager: React.FC = () => {
             onChange={(e) => setNewNoteLabel(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ex: Rose de Damas, Bois de Oud..."
-            className="bg-admin-surface-secondary border-admin-border text-admin-text-primary placeholder:text-admin-text-secondary/50"
+            className="bg-white/5 border border-admin-border rounded-xl px-4 py-2.5 text-sm text-admin-text-primary placeholder:text-admin-text-secondary/50 focus:border-admin-gold/50 outline-none transition-colors w-full"
           />
           <select
             value={newNotePyramid}
             onChange={(e) => setNewNotePyramid(e.target.value as PyramidKey)}
-            className="px-3 py-2 rounded-md bg-admin-surface-secondary border border-admin-border text-admin-text-primary text-sm"
+            className="px-4 py-2.5 rounded-xl bg-white/5 border border-admin-border text-admin-text-primary text-sm focus:border-admin-gold/50 outline-none transition-colors"
           >
             {PYRAMID_KEYS.map(p => (
               <option key={p} value={p}>{PYRAMID_LABELS[p]}</option>
@@ -246,20 +250,20 @@ const OlfactoryNotesManager: React.FC = () => {
           <select
             value={newNoteFamily}
             onChange={(e) => setNewNoteFamily(e.target.value as OlfactoryFamilyType)}
-            className="px-3 py-2 rounded-md bg-admin-surface-secondary border border-admin-border text-admin-text-primary text-sm"
+            className="px-4 py-2.5 rounded-xl bg-white/5 border border-admin-border text-admin-text-primary text-sm focus:border-admin-gold/50 outline-none transition-colors"
           >
             {OLFACTORY_FAMILIES.map(f => (
               <option key={f} value={f}>{f}</option>
             ))}
           </select>
-          <Button
+          <button
             onClick={handleAddNote}
             disabled={!newNoteLabel.trim()}
-            className="bg-admin-gold hover:bg-admin-gold-light text-admin-bg font-medium"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-admin-gold/10 hover:bg-admin-gold/20 border border-admin-gold/30 hover:border-admin-gold/60 text-admin-gold text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
           >
-            <Plus size={16} className="mr-1" />
+            <Plus size={16} />
             Ajouter
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -270,7 +274,7 @@ const OlfactoryNotesManager: React.FC = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Rechercher une note..."
-          className="pl-10 bg-admin-surface-secondary border-admin-border text-admin-text-primary placeholder:text-admin-text-secondary/50"
+          className="pl-10 bg-white/5 border border-admin-border rounded-xl py-2.5 text-sm text-admin-text-primary placeholder:text-admin-text-secondary/50 focus:border-admin-gold/50 outline-none transition-colors w-full"
         />
       </div>
 
@@ -280,10 +284,10 @@ const OlfactoryNotesManager: React.FC = () => {
           <table className="w-full">
             <thead className="bg-admin-surface-secondary border-b border-admin-border">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-admin-text-secondary uppercase tracking-wider">Note</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-admin-text-secondary uppercase tracking-wider">Famille</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-admin-text-secondary uppercase tracking-wider">Pyramide</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-admin-text-secondary uppercase tracking-wider">Actions</th>
+                <th className="px-4 py-3 text-left text-[10px] uppercase tracking-[0.2em] text-admin-text-secondary/60 font-semibold">Note</th>
+                <th className="px-4 py-3 text-left text-[10px] uppercase tracking-[0.2em] text-admin-text-secondary/60 font-semibold">Famille</th>
+                <th className="px-4 py-3 text-left text-[10px] uppercase tracking-[0.2em] text-admin-text-secondary/60 font-semibold">Pyramide</th>
+                <th className="px-4 py-3 text-right text-[10px] uppercase tracking-[0.2em] text-admin-text-secondary/60 font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-admin-border">
@@ -306,14 +310,14 @@ const OlfactoryNotesManager: React.FC = () => {
                             onChange={(e) => setEditState(s => ({ ...s, label: e.target.value }))}
                             onKeyDown={handleEditKeyDown}
                             autoFocus
-                            className="w-full px-2 py-1.5 rounded bg-admin-surface-secondary border border-admin-border text-sm text-admin-text-primary"
+                            className="w-full px-3 py-2 rounded-xl bg-white/5 border border-admin-border text-sm text-admin-text-primary focus:border-admin-gold/50 outline-none transition-colors"
                           />
                         </td>
                         <td className="px-4 py-2">
                           <select
                             value={editState.family}
                             onChange={(e) => setEditState(s => ({ ...s, family: e.target.value as OlfactoryFamilyType }))}
-                            className="px-2 py-1.5 rounded bg-admin-surface-secondary border border-admin-border text-sm text-admin-text-primary"
+                            className="px-3 py-2 rounded-xl bg-white/5 border border-admin-border text-sm text-admin-text-primary focus:border-admin-gold/50 outline-none transition-colors"
                           >
                             {OLFACTORY_FAMILIES.map(f => (
                               <option key={f} value={f}>{f}</option>
@@ -324,7 +328,7 @@ const OlfactoryNotesManager: React.FC = () => {
                           <select
                             value={editState.pyramid}
                             onChange={(e) => setEditState(s => ({ ...s, pyramid: e.target.value as PyramidKey }))}
-                            className="px-2 py-1.5 rounded bg-admin-surface-secondary border border-admin-border text-sm text-admin-text-primary"
+                            className="px-3 py-2 rounded-xl bg-white/5 border border-admin-border text-sm text-admin-text-primary focus:border-admin-gold/50 outline-none transition-colors"
                           >
                             {PYRAMID_KEYS.map(p => (
                               <option key={p} value={p}>{PYRAMID_LABELS[p]}</option>

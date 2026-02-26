@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import bannerNosParfum from '@/assets/bannernosparfum.webp';
 import ProductCard from './ProductCard';
 import { useAdmin } from '@/context/AdminContext';
 import { useAdminStore } from '@/store/useAdminStore';
@@ -14,7 +15,7 @@ import {
   viewportOnce,
 } from '@/lib/animations';
 
-// Courbe très douce pour le survol (comme pour la newsletter)
+// Courbe très douce pour le survol et l'apparition (effet luxe)
 const silkyEase = [0.25, 0.1, 0.25, 1];
 
 interface ProductGridProps {
@@ -72,18 +73,63 @@ const ProductGrid = ({ onAddToCart }: ProductGridProps) => {
   return (
     <section id="notre-selection" className="py-12 md:py-16 lg:py-24 px-5 sm:px-6 md:px-12 lg:px-20">
       <div className="mx-auto max-w-7xl">
-        {/* Section Header */}
+        
+        {/* ── BANNIÈRE EN-TÊTE DE SECTION (Format Panoramique) ── */}
         <motion.div
-          className="text-center mb-8 md:mb-12"
-          variants={sectionVariants}
+          // MODIFICATION ICI : Hauteurs affinées pour un rendu "bandeau large" sur tous les écrans
+          className="relative w-full h-[150px] sm:h-[180px] md:h-[200px] lg:h-[240px] rounded-xl md:rounded-2xl overflow-hidden mb-10 md:mb-16 flex items-center justify-center group"
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
         >
-          <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-normal mb-2 md:mb-4 text-foreground">Notre Selection</h2>
-          <p className="text-xs md:text-sm text-foreground/70 max-w-md mx-auto">
-            Des fragrances d'exception pour chaque personnalite
-          </p>
+          {/* L'image de fond qui arrive en glissant de la droite */}
+          <motion.div
+            className="absolute inset-0 w-full h-full"
+            variants={{
+              hidden: { x: '15%', scale: 1.15, opacity: 0 },
+              visible: { 
+                x: 0, 
+                scale: 1, 
+                opacity: 1, 
+                transition: { duration: 1.4, ease: silkyEase } 
+              }
+            }}
+          >
+            <img
+              src={bannerNosParfum}
+              alt="Notre Collection"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+            {/* Overlay sombre pour garantir la lisibilité du texte */}
+            <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-700" />
+            {/* Dégradé subtil en bas pour l'élégance */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+          </motion.div>
+
+          {/* Le texte qui apparaît délicatement par-dessus */}
+          <motion.div 
+            className="relative z-10 text-center px-4 flex flex-col items-center"
+            variants={{
+              hidden: { y: 20, opacity: 0 },
+              visible: { 
+                y: 0, 
+                opacity: 1, 
+                transition: { duration: 0.8, delay: 0.4, ease: silkyEase } 
+              }
+            }}
+          >
+            <span className="text-[9px] md:text-[10px] lg:text-xs text-[#D4AF37] uppercase tracking-[0.3em] mb-1.5 md:mb-2 block font-medium">
+              Découvrez
+            </span>
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal mb-1.5 md:mb-3 text-white drop-shadow-lg">
+              Notre Collection
+            </h2>
+            <div className="h-px w-12 md:w-16 bg-[#D4AF37] mb-2 md:mb-3 opacity-70" />
+            <p className="text-xs md:text-sm text-white/90 max-w-sm mx-auto font-light tracking-wide drop-shadow-md hidden sm:block">
+              Des fragrances d'exception pour chaque personnalité
+            </p>
+          </motion.div>
         </motion.div>
 
         {/* Filters placeholder */}

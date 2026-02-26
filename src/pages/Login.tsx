@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Lock } from 'lucide-react';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
@@ -13,41 +13,35 @@ import {
   luxuryEase,
 } from '@/lib/animations';
 
+// ─── CONSTANTES ANTI-BRUTE FORCE ───
+const MAX_ATTEMPTS    = 5;
+const LOCKOUT_MS      = 5 * 60 * 1000; // 5 minutes
+
 const Login = () => {
-  const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [identifier, setIdentifier]     = useState('');
+  const [password, setPassword]         = useState('');
+  const [error, setError]               = useState('');
+  const [isLoading, setIsLoading]       = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Anti-brute force
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockedUntil, setLockedUntil]       = useState(0);
+  const [lockCountdown, setLockCountdown]   = useState(0);
+
   const isMountedRef = useRef(true);
 
   const navigate = useNavigate();
   const { login, user } = useAuth();
-  const {
-    cartItems,
-    cartItemsCount,
-    isCartOpen,
-    addToCart,
-    updateQuantity,
-    removeItem,
-    setIsCartOpen,
-    promoCode,
-    promoDiscount,
-    applyPromoCode,
-    clearPromoCode,
-  } = useCart();
+  const { cartItems, isCartOpen, updateQuantity, removeItem, setIsCartOpen } = useCart();
   const { trackPageView, trackPageExit } = useAnalytics();
 
   useEffect(() => {
-    if (user) {
-      navigate('/', { replace: true });
-    }
+    if (user) navigate('/', { replace: true });
   }, [user, navigate]);
 
   useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-    };
+    return () => { isMountedRef.current = false; };
   }, []);
 
   useEffect(() => {
@@ -55,28 +49,64 @@ const Login = () => {
     return () => trackPageExit('/login');
   }, []);
 
+  // Décompte lockout
+  useEffect(() => {
+    if (!lockedUntil) return;
+    const id = setInterval(() => {
+      const left = Math.max(0, Math.ceil((lockedUntil - Date.now()) / 1000));
+      setLockCountdown(left);
+      if (left === 0) {
+        setLockedUntil(0);
+        setFailedAttempts(0);
+        setError('');
+        clearInterval(id);
+      }
+    }, 500);
+    return () => clearInterval(id);
+  }, [lockedUntil]);
+
+  const isLocked = lockedUntil > 0 && Date.now() < lockedUntil;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Vérifier le lockout
+    if (isLocked) {
+      setError(`Trop de tentatives échouées. Réessayez dans ${lockCountdown}s.`);
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const loginPromise = login(identifier, password);
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('La connexion prend trop de temps. Vérifiez votre connexion internet et réessayez.')), 15000)
-      );
+      await Promise.race([
+        login(identifier, password),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('La connexion prend trop de temps. Vérifiez votre connexion internet.')), 15000)
+        ),
+      ]);
 
-      await Promise.race([loginPromise, timeoutPromise]);
+      // Succès → réinitialiser le compteur
+      setFailedAttempts(0);
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Erreur de connexion';
-      setError(msg);
-      if (isMountedRef.current) {
-        setIsLoading(false);
+      const newCount = failedAttempts + 1;
+      setFailedAttempts(newCount);
+
+      if (newCount >= MAX_ATTEMPTS) {
+        const end = Date.now() + LOCKOUT_MS;
+        setLockedUntil(end);
+        setLockCountdown(Math.ceil(LOCKOUT_MS / 1000));
+        setError(`Trop de tentatives échouées. Connexion bloquée pendant 5 minutes.`);
+      } else {
+        const remaining = MAX_ATTEMPTS - newCount;
+        setError(`${msg}${remaining <= 2 ? ` — ${remaining} tentative${remaining > 1 ? 's' : ''} restante${remaining > 1 ? 's' : ''}` : ''}`);
       }
+
+      if (isMountedRef.current) setIsLoading(false);
     } finally {
-      if (isMountedRef.current && !user) {
-        setIsLoading(false);
-      }
+      if (isMountedRef.current && !user) setIsLoading(false);
     }
   };
 
@@ -84,7 +114,7 @@ const Login = () => {
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 py-6 md:py-8 lg:py-12 px-4 md:px-6 lg:px-0">
         <div className="container mx-auto max-w-md">
-          {/* Back button */}
+
           <motion.button
             onClick={() => navigate('/')}
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6 md:mb-8 min-h-10 px-2"
@@ -96,18 +126,14 @@ const Login = () => {
             Retour
           </motion.button>
 
-          {/* Form Container */}
           <motion.div
             className="bg-card rounded-2xl p-4 md:p-8 border border-border/50"
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: luxuryEase, delay: 0.1 }}
           >
-            <motion.div
-              variants={staggerContainerVariants}
-              initial="hidden"
-              animate="visible"
-            >
+            <motion.div variants={staggerContainerVariants} initial="hidden" animate="visible">
+
               <motion.h1
                 variants={staggerItemVariants}
                 className="font-serif text-2xl md:text-3xl lg:text-4xl font-normal mb-2 md:mb-3"
@@ -121,7 +147,24 @@ const Login = () => {
                 Accédez à votre compte Rayha Store
               </motion.p>
 
-              {error && (
+              {/* Bandeau lockout */}
+              {isLocked && (
+                <motion.div
+                  className="mb-6 p-3 md:p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg text-amber-500 text-xs md:text-sm flex items-center gap-3"
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, ease: luxuryEase }}
+                >
+                  <Lock className="w-4 h-4 flex-shrink-0" />
+                  <span>
+                    Trop de tentatives échouées. Connexion disponible dans{' '}
+                    <strong>{Math.floor(lockCountdown / 60)}:{String(lockCountdown % 60).padStart(2, '0')}</strong>
+                  </span>
+                </motion.div>
+              )}
+
+              {/* Erreur standard */}
+              {error && !isLocked && (
                 <motion.div
                   className="mb-6 p-3 md:p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-xs md:text-sm"
                   initial={{ opacity: 0, y: -8 }}
@@ -133,7 +176,8 @@ const Login = () => {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
-                {/* Email ou Pseudo Field */}
+
+                {/* Email ou Pseudo */}
                 <motion.div variants={staggerItemVariants}>
                   <label htmlFor="identifier" className="block text-xs uppercase tracking-widest text-foreground/70 mb-1.5 md:mb-2 font-medium">
                     Email ou Pseudo
@@ -143,13 +187,15 @@ const Login = () => {
                     type="text"
                     placeholder="votre@email.com ou votre pseudo"
                     value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    className="w-full px-4 py-3 md:py-2.5 rounded-lg border border-border bg-background/50 text-base md:text-sm min-h-12 md:min-h-10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
+                    onChange={(e) => { setIdentifier(e.target.value); setError(''); }}
+                    className="w-full px-4 py-3 md:py-2.5 rounded-lg border border-border bg-background/50 text-base md:text-sm min-h-12 md:min-h-10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all disabled:opacity-50"
                     required
+                    disabled={isLocked}
+                    autoComplete="username"
                   />
                 </motion.div>
 
-                {/* Password Field */}
+                {/* Mot de passe */}
                 <motion.div variants={staggerItemVariants}>
                   <label htmlFor="password" className="block text-xs uppercase tracking-widest text-foreground/70 mb-1.5 md:mb-2 font-medium">
                     Mot de passe
@@ -160,9 +206,11 @@ const Login = () => {
                       type={showPassword ? 'text' : 'password'}
                       placeholder="Votre mot de passe"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-4 py-3 md:py-2.5 pr-12 rounded-lg border border-border bg-background/50 text-base md:text-sm min-h-12 md:min-h-10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all"
+                      onChange={(e) => { setPassword(e.target.value); setError(''); }}
+                      className="w-full px-4 py-3 md:py-2.5 pr-12 rounded-lg border border-border bg-background/50 text-base md:text-sm min-h-12 md:min-h-10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all disabled:opacity-50"
                       required
+                      disabled={isLocked}
+                      autoComplete="current-password"
                     />
                     <button
                       type="button"
@@ -174,22 +222,25 @@ const Login = () => {
                   </div>
                 </motion.div>
 
-                {/* Submit Button */}
+                {/* Bouton */}
                 <motion.div variants={staggerItemVariants}>
                   <motion.button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isLoading || isLocked}
                     className="w-full inline-flex items-center justify-center px-4 py-3 md:py-2.5 rounded-lg border border-border/40 hover:border-border/80 hover:bg-secondary/30 transition-all text-sm font-medium text-foreground disabled:opacity-50 min-h-12 md:min-h-10"
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                   >
-                    {isLoading ? 'Connexion en cours...' : 'Se connecter'}
+                    {isLoading
+                      ? 'Connexion en cours…'
+                      : isLocked
+                        ? `Bloqué — ${Math.floor(lockCountdown / 60)}:${String(lockCountdown % 60).padStart(2, '0')}`
+                        : 'Se connecter'}
                   </motion.button>
                 </motion.div>
               </form>
 
-              {/* Links */}
               <motion.div
                 variants={staggerItemVariants}
                 className="mt-6 md:mt-8 space-y-3 md:space-y-4 text-center text-xs md:text-sm"
@@ -200,6 +251,7 @@ const Login = () => {
                   </Link>
                 </div>
               </motion.div>
+
             </motion.div>
           </motion.div>
         </div>
@@ -213,10 +265,6 @@ const Login = () => {
         items={cartItems}
         onUpdateQuantity={updateQuantity}
         onRemoveItem={removeItem}
-        promoCode={promoCode}
-        promoDiscount={promoDiscount}
-        onApplyPromo={applyPromoCode}
-        onClearPromo={clearPromoCode}
       />
     </div>
   );

@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { HashRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -11,41 +11,47 @@ import { AnalyticsProvider } from "@/context/AnalyticsContext";
 import Header from "@/components/Header";
 import DataSyncInitializer from "@/components/DataSyncInitializer";
 import UserDataSyncInitializer from "@/components/UserDataSyncInitializer";
+// Pages critiques (chargées immédiatement)
 import Index from "./pages/Index";
-import ProductDetail from "./pages/ProductDetail";
-import SearchResults from "./pages/SearchResults";
 import AllProducts from "./pages/AllProducts";
-import Favorites from "./pages/Favorites";
-import Checkout from "./pages/Checkout";
-import Success from "./pages/Success";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import UserProfile from "./pages/UserProfile";
-import NotFound from "./pages/NotFound";
-import AdminLayout from "./components/admin/AdminLayout";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminInventory from "./pages/admin/AdminInventory";
-import AdminFeatured from "./pages/admin/AdminFeatured";
-import AdminClients from "./pages/admin/AdminClients";
-import AdminOrders from "./pages/admin/AdminOrders";
-import AdminAnalytics from "./pages/admin/AdminAnalytics";
-import AdminCRM from "./pages/admin/AdminCRM";
-import AdminAbandonedInsights from "./pages/admin/AdminAbandonedInsights";
-import AdminPromoCodes from "./pages/admin/AdminPromoCodes";
-import AdminOlfactoryNotes from "./pages/admin/AdminOlfactoryNotes";
-import AdminGuide from "./pages/AdminGuide";
-import AdminScentIDPage from "./pages/admin/AdminScentIDPage";
+import ProductDetail from "./pages/ProductDetail";
+// Pages secondaires (lazy-loaded)
+import { lazy, Suspense } from "react";
+const SearchResults       = lazy(() => import("./pages/SearchResults"));
+const Favorites           = lazy(() => import("./pages/Favorites"));
+const Checkout            = lazy(() => import("./pages/Checkout"));
+const Success             = lazy(() => import("./pages/Success"));
+const Login               = lazy(() => import("./pages/Login"));
+const Signup              = lazy(() => import("./pages/Signup"));
+const UserProfile         = lazy(() => import("./pages/UserProfile"));
+const MesCommandes        = lazy(() => import("./pages/MesCommandes"));
+const ArtOfPerfuming      = lazy(() => import("./pages/ArtOfPerfuming"));
+const LayeringGuide       = lazy(() => import("./pages/LayeringGuide"));
+const NotFound            = lazy(() => import("./pages/NotFound"));
+// Pages admin (lazy-loaded — bundle séparé)
+const AdminLayout         = lazy(() => import("./components/admin/AdminLayout"));
+const AdminGuide          = lazy(() => import("./pages/AdminGuide"));
+const AdminDashboard      = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminInventory      = lazy(() => import("./pages/admin/AdminInventory"));
+const AdminFeatured       = lazy(() => import("./pages/admin/AdminFeatured"));
+const AdminClients        = lazy(() => import("./pages/admin/AdminClients"));
+const AdminOrders         = lazy(() => import("./pages/admin/AdminOrders"));
+const AdminAnalytics      = lazy(() => import("./pages/admin/AdminAnalytics"));
+const AdminCRM            = lazy(() => import("./pages/admin/AdminCRM"));
+const AdminAbandonedInsights = lazy(() => import("./pages/admin/AdminAbandonedInsights"));
+const AdminPromoCodes     = lazy(() => import("./pages/admin/AdminPromoCodes"));
+const AdminOlfactoryNotes = lazy(() => import("./pages/admin/AdminOlfactoryNotes"));
+const AdminLayering       = lazy(() => import("./pages/admin/AdminLayering"));
+const AdminScentIDPage    = lazy(() => import("./pages/admin/AdminScentIDPage"));
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
-import SyncStatus from "./components/SyncStatus";
 import CookieBanner from "./components/CookieBanner";
 import { useTracking } from "./hooks/useTracking";
-import { Suspense } from "react";
 import { pageVariants } from "./lib/animations";
 
 const queryClient = new QueryClient();
 
-// Inner component with access to useLocation (must be inside HashRouter)
+// Inner component with access to useLocation (must be inside BrowserRouter)
 const AppRoutes = () => {
   const location = useLocation();
 
@@ -78,6 +84,9 @@ const AppRoutes = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/mes-informations" element={<UserProfile />} />
+            <Route path="/mes-commandes" element={<MesCommandes />} />
+            <Route path="/art-de-se-parfumer" element={<ArtOfPerfuming />} />
+            <Route path="/art-du-layering" element={<LayeringGuide />} />
             <Route path="/admin" element={
               <ProtectedRoute requiredRole="admin">
                 <AdminGuide />
@@ -140,6 +149,11 @@ const AppRoutes = () => {
                 <AdminLayout><AdminScentIDPage /></AdminLayout>
               </ProtectedRoute>
             } />
+            <Route path="/admin/layering" element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminLayout><AdminLayering /></AdminLayout>
+              </ProtectedRoute>
+            } />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
@@ -156,10 +170,9 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <HashRouter>
+        <BrowserRouter>
           <Toaster />
           <Sonner />
-          <SyncStatus />
           <AnalyticsProvider>
             <AuthProvider>
               <AdminProvider>
@@ -176,7 +189,7 @@ const App = () => {
               </AdminProvider>
             </AuthProvider>
           </AnalyticsProvider>
-        </HashRouter>
+        </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   );

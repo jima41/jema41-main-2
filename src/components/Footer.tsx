@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Mail } from 'lucide-react';
 import {
   slideLeftVariants,
@@ -149,9 +150,19 @@ const Footer = () => {
             </motion.h4>
             <ul className="space-y-4">
               <motion.li variants={staggerItemVariants}>
-                <a href="#" className="text-sm text-white/55 font-light hover:text-white transition-colors duration-200">
+                <Link to="/all-products" className="text-sm text-white/55 font-light hover:text-white transition-colors duration-200">
                   Tous les Parfums
-                </a>
+                </Link>
+              </motion.li>
+              <motion.li variants={staggerItemVariants}>
+                <Link to="/art-de-se-parfumer" className="text-sm text-white/55 font-light hover:text-white transition-colors duration-200">
+                  L'Art de se Parfumer
+                </Link>
+              </motion.li>
+              <motion.li variants={staggerItemVariants}>
+                <Link to="/art-du-layering" className="text-sm text-white/55 font-light hover:text-white transition-colors duration-200">
+                  L'Art de Combiner
+                </Link>
               </motion.li>
             </ul>
           </motion.div>

@@ -33,6 +33,8 @@ const AdminClients = () => {
   const [modal, setModal] = useState<UserModalData>({ user: null, isOpen: false });
   const [editForm, setEditForm] = useState<Partial<User>>({});
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Vérification d'accès admin
   useEffect(() => {
@@ -164,30 +166,36 @@ const AdminClients = () => {
   };
 
   const handleDeleteUser = async (userId: string) => {
+    setDeleteError(null);
+    setDeleteLoading(true);
     try {
-      // Supprimer les données associées puis le profil
-      await supabase.from('cart_items').delete().eq('user_id', userId);
-      await supabase.from('wishlist').delete().eq('user_id', userId);
-      const { error } = await supabase.from('profiles').delete().eq('id', userId);
+      const { data, error } = await supabase.functions.invoke('delete-user', {
+        body: { userId },
+      });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
       await loadUsers();
       setDeleteConfirm(null);
-    } catch (error) {
-      console.error('Erreur:', error);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erreur lors de la suppression';
+      setDeleteError(message);
+      console.error('Erreur suppression:', err);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
   const nonAdminUsers = users.filter(u => u.role === 'user');
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-montserrat font-bold tracking-tighter text-admin-text-primary mb-2">
+        <h1 className="text-3xl font-bold text-admin-text-primary font-montserrat tracking-tighter">
           Clients
         </h1>
-        <p className="text-admin-text-secondary">Gérez les informations et les comptes clients</p>
+        <p className="text-admin-text-secondary mt-1">Gérez les informations et les comptes clients</p>
       </div>
 
       {/* Users Table */}
@@ -262,7 +270,7 @@ const AdminClients = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-admin-surface rounded-xl max-w-md w-full max-h-screen overflow-y-auto p-6 border border-admin-border"
+            className="glass-panel rounded-2xl max-w-md w-full max-h-screen overflow-y-auto p-6 border border-admin-border"
             onClick={e => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold text-admin-text-primary mb-6">Modifier le client</h2>
@@ -276,7 +284,7 @@ const AdminClients = () => {
                   type="text"
                   value={modal.user.username}
                   disabled
-                  className="w-full px-3 py-2 bg-admin-surface-secondary border border-admin-border rounded text-admin-text-secondary cursor-not-allowed"
+                  className="w-full px-4 py-2.5 bg-white/5 border border-admin-border rounded-xl text-admin-text-secondary cursor-not-allowed"
                 />
               </div>
 
@@ -286,7 +294,7 @@ const AdminClients = () => {
                   type="email"
                   value={(editForm as any).email || ''}
                   onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                  className="w-full px-3 py-2 bg-admin-surface-secondary border border-admin-border rounded text-admin-text-primary focus:border-[#D4AF37] outline-none"
+                  className="w-full px-4 py-2.5 bg-white/5 border border-admin-border rounded-xl text-sm text-admin-text-primary focus:border-admin-gold/50 outline-none transition-colors"
                 />
               </div>
 
@@ -296,7 +304,7 @@ const AdminClients = () => {
                   type="text"
                   value={(editForm as any).firstName || ''}
                   onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
-                  className="w-full px-3 py-2 bg-admin-surface-secondary border border-admin-border rounded text-admin-text-primary focus:border-[#D4AF37] outline-none"
+                  className="w-full px-4 py-2.5 bg-white/5 border border-admin-border rounded-xl text-sm text-admin-text-primary focus:border-admin-gold/50 outline-none transition-colors"
                 />
               </div>
 
@@ -306,7 +314,7 @@ const AdminClients = () => {
                   type="text"
                   value={(editForm as any).lastName || ''}
                   onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
-                  className="w-full px-3 py-2 bg-admin-surface-secondary border border-admin-border rounded text-admin-text-primary focus:border-[#D4AF37] outline-none"
+                  className="w-full px-4 py-2.5 bg-white/5 border border-admin-border rounded-xl text-sm text-admin-text-primary focus:border-admin-gold/50 outline-none transition-colors"
                 />
               </div>
             </div>
@@ -358,13 +366,13 @@ const AdminClients = () => {
             <div className="flex gap-3">
               <button
                 onClick={handleCloseModal}
-                className="flex-1 px-4 py-2 bg-admin-surface-secondary border border-admin-border rounded text-admin-text-primary hover:bg-admin-surface transition-colors"
+                className="flex-1 px-4 py-2.5 bg-white/5 border border-admin-border rounded-xl text-admin-text-primary hover:bg-white/10 transition-colors text-sm"
               >
                 Annuler
               </button>
               <button
                 onClick={handleSaveUser}
-                className="flex-1 px-4 py-2 bg-[#D4AF37]/20 border border-[#D4AF37]/50 rounded text-[#D4AF37] hover:bg-[#D4AF37]/30 transition-colors"
+                className="flex-1 px-4 py-2.5 bg-admin-gold/10 border border-admin-gold/30 rounded-xl text-admin-gold hover:bg-admin-gold/20 hover:border-admin-gold/60 transition-colors text-sm font-medium"
               >
                 Enregistrer
               </button>
@@ -379,27 +387,36 @@ const AdminClients = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-          onClick={() => setDeleteConfirm(null)}
+          onClick={() => { setDeleteConfirm(null); setDeleteError(null); }}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-admin-surface rounded-xl p-6 border border-admin-border max-w-sm"
+            className="glass-panel rounded-2xl p-6 border border-admin-border max-w-sm"
             onClick={e => e.stopPropagation()}
           >
-            <h3 className="text-lg font-bold text-admin-text-primary mb-4">Supprimer ce client?</h3>
+            <h3 className="text-lg font-bold text-admin-text-primary mb-2">Supprimer ce client?</h3>
+            <p className="text-sm text-admin-text-secondary mb-4">Cette action est irréversible. Le compte et toutes ses données seront supprimés.</p>
+            {deleteError && (
+              <p className="text-red-400 text-sm mb-4 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">{deleteError}</p>
+            )}
             <div className="flex gap-3">
               <button
-                onClick={() => setDeleteConfirm(null)}
-                className="flex-1 px-4 py-2 bg-admin-surface-secondary border border-admin-border rounded text-admin-text-primary hover:bg-admin-surface transition-colors"
+                onClick={() => { setDeleteConfirm(null); setDeleteError(null); }}
+                disabled={deleteLoading}
+                className="flex-1 px-4 py-2.5 bg-white/5 border border-admin-border rounded-xl text-admin-text-primary hover:bg-white/10 transition-colors text-sm disabled:opacity-50"
               >
                 Annuler
               </button>
               <button
                 onClick={() => handleDeleteUser(deleteConfirm)}
-                className="flex-1 px-4 py-2 bg-red-500/20 border border-red-500/50 rounded text-red-500 hover:bg-red-500/30 transition-colors"
+                disabled={deleteLoading}
+                className="flex-1 px-4 py-2.5 bg-red-500/20 border border-red-500/50 rounded-xl text-red-500 hover:bg-red-500/30 transition-colors text-sm font-medium disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                Supprimer
+                {deleteLoading ? (
+                  <span className="w-4 h-4 border-2 border-red-500/50 border-t-red-500 rounded-full animate-spin" />
+                ) : null}
+                {deleteLoading ? 'Suppression...' : 'Supprimer'}
               </button>
             </div>
           </motion.div>

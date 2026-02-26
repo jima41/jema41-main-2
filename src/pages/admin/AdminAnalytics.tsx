@@ -184,8 +184,8 @@ const AdminAnalytics = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-light tracking-wider" style={fontSerif}>ANALYSE</h1>
-          <p className="text-muted-foreground text-sm mt-1">
+          <h1 className="text-3xl font-bold text-admin-text-primary font-montserrat tracking-tighter">Analytics</h1>
+          <p className="text-admin-text-secondary mt-1">
             Affluence du site, comportement des visiteurs et métriques des produits
           </p>
         </div>
@@ -200,15 +200,15 @@ const AdminAnalytics = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-border/30 pb-px">
+      <div className="flex gap-1 border-b border-admin-border pb-px">
         {tabs.map(tab => (
           <button
             key={tab.key}
             onClick={() => setSelectedView(tab.key)}
             className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all border-b-2 -mb-px ${
               selectedView === tab.key
-                ? 'border-[#D4AF37] text-foreground'
-                : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
+                ? 'border-admin-gold text-admin-text-primary'
+                : 'border-transparent text-admin-text-secondary hover:text-admin-text-primary hover:border-admin-border'
             }`}
           >
             {tab.icon}
@@ -289,7 +289,7 @@ const AdminAnalytics = () => {
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Hourly Traffic */}
-            <Card className="border border-border/40">
+            <Card className="border border-admin-border glass-panel">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-light tracking-wider" style={fontSerif}>
                   AFFLUENCE PAR HEURE
@@ -321,7 +321,7 @@ const AdminAnalytics = () => {
             </Card>
 
             {/* Device Breakdown */}
-            <Card className="border border-border/40">
+            <Card className="border border-admin-border glass-panel">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-light tracking-wider" style={fontSerif}>
                   APPAREILS
@@ -371,7 +371,7 @@ const AdminAnalytics = () => {
           {/* Top Pages & Products side by side */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Top Pages */}
-            <Card className="border border-border/40">
+            <Card className="border border-admin-border glass-panel">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-light tracking-wider" style={fontSerif}>TOP PAGES</CardTitle>
               </CardHeader>
@@ -379,23 +379,23 @@ const AdminAnalytics = () => {
                 <div className="space-y-2">
                   {stats.pageStats.slice(0, 5).map((p, i) => (
                     <div key={p.path} className="flex items-center gap-3 py-2 border-b border-border/10 last:border-0">
-                      <span className="text-xs text-muted-foreground w-5">{i + 1}.</span>
+                      <span className="text-xs text-admin-text-secondary w-5">{i + 1}.</span>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{getPageLabel(p.path, p.title)}</p>
-                        <p className="text-xs text-muted-foreground">{p.path}</p>
+                        <p className="text-xs text-admin-text-secondary">{p.path}</p>
                       </div>
                       <Badge variant="secondary" className="text-xs">{p.views} vues</Badge>
                     </div>
                   ))}
                   {stats.pageStats.length === 0 && (
-                    <p className="text-sm text-muted-foreground text-center py-4">Aucune donnée</p>
+                    <p className="text-sm text-admin-text-secondary text-center py-4">Aucune donnée</p>
                   )}
                 </div>
               </CardContent>
             </Card>
 
             {/* Top Products Chart */}
-            <Card className="border border-border/40">
+            <Card className="border border-admin-border glass-panel">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-light tracking-wider" style={fontSerif}>TOP PRODUITS VUS</CardTitle>
               </CardHeader>
@@ -420,7 +420,7 @@ const AdminAnalytics = () => {
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <p className="text-sm text-muted-foreground text-center py-4">Aucune donnée produit</p>
+                  <p className="text-sm text-admin-text-secondary text-center py-4">Aucune donnée produit</p>
                 )}
               </CardContent>
             </Card>
@@ -451,7 +451,7 @@ const AdminAnalytics = () => {
       {selectedView === 'pages' && (
         <div className="space-y-6">
           {/* Page Distribution Chart */}
-          <Card className="border border-border/40">
+          <Card className="border border-admin-border glass-panel">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-light tracking-wider" style={fontSerif}>
                 DISTRIBUTION DES PAGES VUES
@@ -482,13 +482,13 @@ const AdminAnalytics = () => {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-8">Naviguez sur le site pour générer des données</p>
+                <p className="text-sm text-admin-text-secondary text-center py-8">Naviguez sur le site pour générer des données</p>
               )}
             </CardContent>
           </Card>
 
           {/* Pages Table */}
-          <Card className="border border-border/40">
+          <Card className="border border-admin-border glass-panel">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-light tracking-wider" style={fontSerif}>
                 DÉTAIL PAR PAGE
@@ -500,11 +500,11 @@ const AdminAnalytics = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border/20">
-                      <th className="text-left py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">Page</th>
-                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">Vues</th>
-                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">Clics</th>
-                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">Durée moy.</th>
-                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">Rebond</th>
+                      <th className="text-left py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">Page</th>
+                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">Vues</th>
+                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">Clics</th>
+                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">Durée moy.</th>
+                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">Rebond</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -513,7 +513,7 @@ const AdminAnalytics = () => {
                         <td className="py-3 px-3">
                           <div>
                             <p className="font-medium">{getPageLabel(page.path, page.title)}</p>
-                            <p className="text-xs text-muted-foreground">{page.path}</p>
+                            <p className="text-xs text-admin-text-secondary">{page.path}</p>
                           </div>
                         </td>
                         <td className="text-center py-3 px-3">
@@ -530,7 +530,7 @@ const AdminAnalytics = () => {
                     ))}
                     {stats.pageStats.length === 0 && (
                       <tr>
-                        <td colSpan={5} className="text-center py-8 text-muted-foreground">
+                        <td colSpan={5} className="text-center py-8 text-admin-text-secondary">
                           Aucune donnée — naviguez sur le site pour commencer
                         </td>
                       </tr>
@@ -576,7 +576,7 @@ const AdminAnalytics = () => {
 
           {/* Products Duration Chart */}
           {enrichedProductStats.length > 0 && (
-            <Card className="border border-border/40">
+            <Card className="border border-admin-border glass-panel">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-light tracking-wider" style={fontSerif}>
                   ENGAGEMENT PAR PRODUIT
@@ -606,7 +606,7 @@ const AdminAnalytics = () => {
           )}
 
           {/* Products Table */}
-          <Card className="border border-border/40">
+          <Card className="border border-admin-border glass-panel">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-light tracking-wider" style={fontSerif}>
                 MÉTRIQUES PRODUITS
@@ -617,11 +617,11 @@ const AdminAnalytics = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border/20">
-                      <th className="text-left py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">Produit</th>
-                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">Vues</th>
-                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">Clics</th>
-                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">Temps moy.</th>
-                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">Engagement</th>
+                      <th className="text-left py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">Produit</th>
+                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">Vues</th>
+                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">Clics</th>
+                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">Temps moy.</th>
+                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">Engagement</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -646,14 +646,14 @@ const AdminAnalytics = () => {
                                 }}
                               />
                             </div>
-                            <span className="text-xs text-muted-foreground">{fmtPercent(product.conversionRate)}</span>
+                            <span className="text-xs text-admin-text-secondary">{fmtPercent(product.conversionRate)}</span>
                           </div>
                         </td>
                       </tr>
                     ))}
                     {enrichedProductStats.length === 0 && (
                       <tr>
-                        <td colSpan={5} className="text-center py-8 text-muted-foreground">
+                        <td colSpan={5} className="text-center py-8 text-admin-text-secondary">
                           Aucun produit consulté — visitez des fiches produits pour commencer
                         </td>
                       </tr>
@@ -705,7 +705,7 @@ const AdminAnalytics = () => {
 
           {/* Top 5 Bar Chart */}
           {productRanking.length > 0 && (
-            <Card className="border border-border/40">
+            <Card className="border border-admin-border glass-panel">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-light tracking-wider" style={fontSerif}>
                   TOP 5 — SCORE GLOBAL
@@ -739,7 +739,7 @@ const AdminAnalytics = () => {
           )}
 
           {/* Full Ranking Table */}
-          <Card className="border border-border/40">
+          <Card className="border border-admin-border glass-panel">
             <CardHeader className="pb-2">
               <div className="flex items-center gap-2">
                 <Trophy className="w-4 h-4" style={{ color: GOLD }} />
@@ -754,21 +754,21 @@ const AdminAnalytics = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border/20">
-                      <th className="text-center py-3 px-2 text-xs uppercase tracking-wider text-muted-foreground font-medium w-10">#</th>
-                      <th className="text-left py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">Produit</th>
-                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                      <th className="text-center py-3 px-2 text-xs uppercase tracking-wider text-admin-text-secondary font-medium w-10">#</th>
+                      <th className="text-left py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">Produit</th>
+                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">
                         <div className="flex items-center justify-center gap-1"><Eye className="w-3 h-3" /> Vues</div>
                       </th>
-                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">
                         <div className="flex items-center justify-center gap-1"><ShoppingCart className="w-3 h-3" /> Panier</div>
                       </th>
-                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">
                         <div className="flex items-center justify-center gap-1"><Package className="w-3 h-3" /> Commandé</div>
                       </th>
-                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">
                         <div className="flex items-center justify-center gap-1"><Heart className="w-3 h-3" /> Likes</div>
                       </th>
-                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-muted-foreground font-medium">Score</th>
+                      <th className="text-center py-3 px-3 text-xs uppercase tracking-wider text-admin-text-secondary font-medium">Score</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -780,7 +780,7 @@ const AdminAnalytics = () => {
                               {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
                             </span>
                           ) : (
-                            <span className="text-xs text-muted-foreground font-medium">{index + 1}</span>
+                            <span className="text-xs text-admin-text-secondary font-medium">{index + 1}</span>
                           )}
                         </td>
                         <td className="py-3 px-3">
@@ -796,14 +796,14 @@ const AdminAnalytics = () => {
                           {product.ordered > 0 ? (
                             <Badge variant="secondary" className="text-xs">{product.ordered}</Badge>
                           ) : (
-                            <span className="text-xs text-muted-foreground">—</span>
+                            <span className="text-xs text-admin-text-secondary">—</span>
                           )}
                         </td>
                         <td className="text-center py-3 px-3">
                           {product.likes > 0 ? (
                             <span className="text-red-400 font-medium">{product.likes} ❤️</span>
                           ) : (
-                            <span className="text-xs text-muted-foreground">—</span>
+                            <span className="text-xs text-admin-text-secondary">—</span>
                           )}
                         </td>
                         <td className="text-center py-3 px-3">
@@ -824,7 +824,7 @@ const AdminAnalytics = () => {
                     ))}
                     {productRanking.length === 0 && (
                       <tr>
-                        <td colSpan={7} className="text-center py-8 text-muted-foreground">
+                        <td colSpan={7} className="text-center py-8 text-admin-text-secondary">
                           Aucun produit — ajoutez des produits et naviguez sur le site
                         </td>
                       </tr>
@@ -864,20 +864,20 @@ const AdminAnalytics = () => {
               {currentSession ? (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="p-3 bg-background/50 rounded-lg border border-border/30">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Durée</p>
+                    <div className="p-3 bg-admin-bg/50 rounded-xl border border-admin-border glass-panel/30">
+                      <p className="text-xs text-admin-text-secondary uppercase tracking-wider mb-1">Durée</p>
                       <p className="text-xl font-light" style={{ color: GOLD }}>{fmt(now - currentSession.startTime)}</p>
                     </div>
-                    <div className="p-3 bg-background/50 rounded-lg border border-border/30">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Pages</p>
+                    <div className="p-3 bg-admin-bg/50 rounded-xl border border-admin-border glass-panel/30">
+                      <p className="text-xs text-admin-text-secondary uppercase tracking-wider mb-1">Pages</p>
                       <p className="text-xl font-light" style={{ color: GOLD }}>{currentSession.pageViews.length}</p>
                     </div>
-                    <div className="p-3 bg-background/50 rounded-lg border border-border/30">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Produits</p>
+                    <div className="p-3 bg-admin-bg/50 rounded-xl border border-admin-border glass-panel/30">
+                      <p className="text-xs text-admin-text-secondary uppercase tracking-wider mb-1">Produits</p>
                       <p className="text-xl font-light" style={{ color: GOLD }}>{currentSession.productViews.length}</p>
                     </div>
-                    <div className="p-3 bg-background/50 rounded-lg border border-border/30">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Clics</p>
+                    <div className="p-3 bg-admin-bg/50 rounded-xl border border-admin-border glass-panel/30">
+                      <p className="text-xs text-admin-text-secondary uppercase tracking-wider mb-1">Clics</p>
                       <p className="text-xl font-light" style={{ color: GOLD }}>{currentSession.totalClicks}</p>
                     </div>
                   </div>
@@ -885,7 +885,7 @@ const AdminAnalytics = () => {
                   {/* Live page trail */}
                   {currentSession.pageViews.length > 0 && (
                     <div>
-                      <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Parcours de navigation</p>
+                      <p className="text-xs uppercase tracking-wider text-admin-text-secondary mb-2">Parcours de navigation</p>
                       <div className="flex flex-wrap gap-1.5">
                         {currentSession.pageViews.map((pv, i) => {
                           const isLast = i === currentSession.pageViews.length - 1;
@@ -897,7 +897,7 @@ const AdminAnalytics = () => {
                               <div className={`px-2.5 py-1 rounded text-xs border ${
                                 isLast
                                   ? 'bg-[#D4AF37]/10 border-[#D4AF37]/30 text-foreground'
-                                  : 'bg-secondary/30 border-border/20 text-muted-foreground'
+                                  : 'bg-secondary/30 border-border/20 text-admin-text-secondary'
                               }`}>
                                 <span>{getPageLabel(pv.path, pv.pageTitle)}</span>
                                 {duration > 0 && (
@@ -905,7 +905,7 @@ const AdminAnalytics = () => {
                                 )}
                               </div>
                               {i < currentSession.pageViews.length - 1 && (
-                                <span className="text-muted-foreground text-xs">→</span>
+                                <span className="text-admin-text-secondary text-xs">→</span>
                               )}
                             </div>
                           );
@@ -917,7 +917,7 @@ const AdminAnalytics = () => {
                   {/* Live product views */}
                   {currentSession.productViews.length > 0 && (
                     <div>
-                      <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Produits consultés</p>
+                      <p className="text-xs uppercase tracking-wider text-admin-text-secondary mb-2">Produits consultés</p>
                       <div className="flex flex-wrap gap-2">
                         {currentSession.productViews.map((prv, i) => (
                           <Badge key={i} variant="outline" className="text-xs">
@@ -932,13 +932,13 @@ const AdminAnalytics = () => {
                   )}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground py-2">Aucune session active</p>
+                <p className="text-sm text-admin-text-secondary py-2">Aucune session active</p>
               )}
             </CardContent>
           </Card>
 
           {/* Sessions History */}
-          <Card className="border border-border/40">
+          <Card className="border border-admin-border glass-panel">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-light tracking-wider" style={fontSerif}>
                 HISTORIQUE ({sessions.length} sessions)
@@ -950,7 +950,7 @@ const AdminAnalytics = () => {
                   .sort((a, b) => b.startTime - a.startTime)
                   .slice(0, 20)
                   .map((session) => (
-                    <div key={session.sessionId} className="p-4 border border-border/20 rounded-lg hover:bg-secondary/10 transition-colors">
+                    <div key={session.sessionId} className="p-4 border border-admin-border glass-panel/20 rounded-xl hover:bg-white/5 transition-colors">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           {session.isActive ? (
@@ -976,19 +976,19 @@ const AdminAnalytics = () => {
                       </div>
                       <div className="grid grid-cols-4 gap-3 text-xs">
                         <div>
-                          <span className="text-muted-foreground">Durée</span>
+                          <span className="text-admin-text-secondary">Durée</span>
                           <p className="font-medium">{fmt(session.totalDuration || (session.endTime ? session.endTime - session.startTime : now - session.startTime))}</p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Pages</span>
+                          <span className="text-admin-text-secondary">Pages</span>
                           <p className="font-medium">{session.pageViews.length}</p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Produits</span>
+                          <span className="text-admin-text-secondary">Produits</span>
                           <p className="font-medium">{session.productViews.length}</p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Clics</span>
+                          <span className="text-admin-text-secondary">Clics</span>
                           <p className="font-medium">{session.totalClicks}</p>
                         </div>
                       </div>
@@ -996,7 +996,7 @@ const AdminAnalytics = () => {
                       {session.pageViews.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1">
                           {session.pageViews.map((pv, i) => (
-                            <span key={i} className="text-xs text-muted-foreground">
+                            <span key={i} className="text-xs text-admin-text-secondary">
                               {getPageLabel(pv.path, pv.pageTitle)}{i < session.pageViews.length - 1 ? ' → ' : ''}
                             </span>
                           ))}
@@ -1005,7 +1005,7 @@ const AdminAnalytics = () => {
                     </div>
                   ))}
                 {sessions.length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-8">
+                  <p className="text-sm text-admin-text-secondary text-center py-8">
                     Aucune session passée — les sessions seront enregistrées automatiquement
                   </p>
                 )}
@@ -1032,20 +1032,18 @@ function KpiCard({ title, value, subtitle, icon, isText, small, color }: {
   color?: string;
 }) {
   return (
-    <Card className="border border-border/40">
-      <CardContent className={small ? 'p-4' : 'p-5'}>
-        <div className="flex items-start justify-between mb-2">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium leading-tight" style={{ fontFamily: 'Cormorant Garamond, serif', maxWidth: '80%' }}>
-            {title}
-          </p>
-          <div className="text-muted-foreground/50">{icon}</div>
-        </div>
-        <p className={`${small ? 'text-2xl' : 'text-3xl'} font-light`} style={{ color: color || GOLD }}>
-          {isText ? value : typeof value === 'number' ? value.toLocaleString('fr-FR') : value}
+    <div className="glass-panel border border-admin-border rounded-xl p-4">
+      <div className="flex items-start justify-between mb-2">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-admin-text-secondary/60 leading-tight" style={{ maxWidth: '80%' }}>
+          {title}
         </p>
-        <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
-      </CardContent>
-    </Card>
+        <div className="text-admin-text-secondary/50">{icon}</div>
+      </div>
+      <p className={`${small ? 'text-2xl' : 'text-3xl'} font-bold font-montserrat`} style={{ color: color || GOLD }}>
+        {isText ? value : typeof value === 'number' ? value.toLocaleString('fr-FR') : value}
+      </p>
+      <p className="text-xs text-admin-text-secondary mt-1">{subtitle}</p>
+    </div>
   );
 }
 

@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, RotateCcw, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { RotateCcw, Droplets } from 'lucide-react';
 import { useAdminStore, type Product } from '@/store/useAdminStore';
-import ProductCard from '@/components/ProductCard';
 import { useCart } from '@/context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -45,126 +43,98 @@ const QUESTIONS = [
       { label: "Épices Chaudes", value: "spicy" },
       { label: "Vanille & Ambre", value: "gourmand" }
     ]
+  },
+  {
+    id: 4,
+    question: "Quel sillage souhaitez-vous laisser ?",
+    options: [
+      { label: "Une aura de mystère", value: "mystery" },
+      { label: "Une élégance intemporelle", value: "elegance" },
+      { label: "Un caractère audacieux", value: "boldness" },
+      { label: "Une douceur magnétique", value: "softness" }
+    ]
   }
 ];
+
+// Easing extrêmement doux pour le luxe
+const silkyEase = [0.25, 0.1, 0.25, 1];
 
 // ============================================================================
 // ANIMATIONS & SUB-COMPONENTS
 // ============================================================================
 
-// Motion variants for quiz transitions (diffusion olfactive)
-const questionVariants = {
-  initial: { opacity: 0, y: 20, filter: 'blur(10px)' },
-  animate: {
-    opacity: 1,
-    y: 0,
-    filter: 'blur(0px)',
-    transition: { duration: 0.6, ease: 'easeOut', when: 'beforeChildren', staggerChildren: 0.1 }
-  },
-  exit: { opacity: 0, y: -20, filter: 'blur(10px)', transition: { duration: 0.4, ease: 'easeInOut' } }
-};
-
-const optionVariant = {
-  initial: { opacity: 0, y: 8, filter: 'blur(6px)' },
-  animate: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.45, ease: 'easeOut' } },
-  exit: { opacity: 0, y: -6, filter: 'blur(6px)', transition: { duration: 0.3 } }
-};
-
 const SprayBurst = ({ onComplete }: { onComplete: () => void }) => {
   return (
     <motion.div
-      className="absolute inset-0 z-[50] flex items-center justify-center pointer-events-none"
+      className="absolute inset-0 z-[50] flex items-center justify-center pointer-events-none overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onAnimationComplete={onComplete}
     >
-      {/* Subtle Mist Flash */}
       <motion.div
-        className="absolute w-full h-full bg-white/10 blur-3xl"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: [0, 0.5, 0] }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="absolute w-[200%] h-[200%] bg-gradient-radial from-white/10 via-[#D4AF37]/5 to-transparent blur-[100px]"
+        initial={{ scale: 0.5, opacity: 0 }}
+        animate={{ scale: [0.5, 1.2, 1.5], opacity: [0, 0.5, 0] }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
       />
-      
-      {/* Fine Golden Particles */}
-      {[...Array(12)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full bg-[#D4AF37]"
-          style={{ width: Math.random() * 2 + 'px', height: Math.random() * 2 + 'px' }}
-          initial={{ x: 0, y: 0, opacity: 0 }}
-          animate={{ 
-            x: (Math.random() - 0.5) * 600, 
-            y: (Math.random() - 0.5) * 400,
-            opacity: [0, 1, 0],
-            scale: [0, 1.5, 0]
-          }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        />
-      ))}
     </motion.div>
   );
 };
 
 const FillingBottle = ({ onComplete }: { onComplete: () => void }) => {
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-7">
-
-      {/* ── Flacon SVG ───────────────────────────────────── */}
-      <svg viewBox="0 0 60 130" width="54" height="116" overflow="visible">
+    <div className="flex flex-col items-center justify-center h-full">
+      <svg viewBox="0 0 100 160" width="70" height="112" overflow="visible" className="drop-shadow-2xl mb-8">
         <defs>
-          <clipPath id="flacon-clip">
-            {/* Forme du corps du flacon uniquement */}
-            <path d="M 23 27 Q 8 33 8 46 L 8 118 Q 8 126 16 126 L 44 126 Q 52 126 52 118 L 52 46 Q 52 33 37 27 Z" />
+          <clipPath id="luxeBottleClip">
+            <path d="M25 60 h50 v85 c0 2.76 -2.24 5 -5 5 h-40 c-2.76 0 -5 -2.24 -5 -5 v-85 z" />
           </clipPath>
+          <linearGradient id="goldLiquid" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#A68A56" />
+            <stop offset="50%" stopColor="#FCEEAC" />
+            <stop offset="100%" stopColor="#D4AF37" />
+          </linearGradient>
         </defs>
 
-        {/* Liquide blanc — monte du bas */}
-        <motion.rect
-          x="8" width="44"
-          fill="rgba(255, 255, 255, 0.78)"
-          clipPath="url(#flacon-clip)"
-          initial={{ y: 126, height: 0 }}
-          animate={{ y: 48, height: 78 }}
-          transition={{ duration: 2.0, ease: [0.25, 0.46, 0.45, 0.94] }}
-          onAnimationComplete={() => setTimeout(onComplete, 500)}
-        />
-
-        {/* Reflet vertical — apparaît quand le flacon est rempli */}
-        <motion.line
-          x1="17" y1="55" x2="17" y2="112"
-          stroke="rgba(255,255,255,0.18)"
-          strokeWidth="2"
-          strokeLinecap="round"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 0.5, 0.18] }}
-          transition={{ delay: 1.85, duration: 0.9 }}
-        />
-
-        {/* Contour corps */}
+        <rect x="35" y="10" width="30" height="35" rx="1" fill="#0E0E0E" stroke="#222" strokeWidth="1" />
+        <rect x="42" y="45" width="16" height="10" fill="#D4AF37" />
+        
         <path
-          d="M 23 27 Q 8 33 8 46 L 8 118 Q 8 126 16 126 L 44 126 Q 52 126 52 118 L 52 46 Q 52 33 37 27 Z"
+          d="M20 60 h60 v85 c0 5.52 -4.48 10 -10 10 h-40 c-5.52 0 -10 -4.48 -10 -10 v-85 z"
           fill="none"
-          stroke="#D4AF37"
-          strokeWidth="0.85"
+          stroke="rgba(255,255,255,0.15)"
+          strokeWidth={1}
         />
-        {/* Col */}
-        <rect x="24" y="10" width="12" height="18" fill="none" stroke="#D4AF37" strokeWidth="0.85" />
-        {/* Bouchon */}
-        <rect x="19" y="1" width="22" height="10" rx="1.5" fill="none" stroke="#D4AF37" strokeWidth="0.85" />
-        {/* Fine ligne dorée de séparation col/corps */}
-        <line x1="18" y1="27" x2="42" y2="27" stroke="#D4AF37" strokeWidth="0.5" opacity="0.4" />
+
+        <motion.rect
+          x={25}
+          width={50}
+          rx={2}
+          fill="url(#goldLiquid)"
+          clipPath="url(#luxeBottleClip)"
+          initial={{ y: 150, height: 0 }}
+          animate={{ y: 70, height: 80 }}
+          transition={{ duration: 2.2, ease: silkyEase }}
+          onAnimationComplete={() => setTimeout(onComplete, 600)}
+          className="opacity-80"
+        />
+        
+        <motion.rect 
+          x="28" y="65" width="4" height="70" fill="#ffffff" rx="1"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.1, 0.05] }}
+          transition={{ delay: 1.5, duration: 1 }}
+        />
       </svg>
 
-      {/* Texte */}
       <motion.p
-        className="font-serif text-[11px] text-white/40 italic tracking-[0.22em]"
+        className="font-serif text-[10px] text-[#A68A56] uppercase tracking-[0.4em]"
         initial={{ opacity: 0 }}
-        animate={{ opacity: [0, 0.75, 0.45, 0.75] }}
+        animate={{ opacity: [0, 1, 0.5, 1] }}
         transition={{ duration: 2.6, ease: "easeInOut" }}
       >
-        Création de votre accord...
+        L'alchimie opère
       </motion.p>
     </div>
   );
@@ -179,76 +149,63 @@ const DiagnosticRitual = () => {
   const [isSpraying, setIsSpraying] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [recommendations, setRecommendations] = useState<Product[]>([]);
+  
+  const [perfectMatch, setPerfectMatch] = useState<Product | null>(null);
   
   const { products, isInitialized, initializeProducts } = useAdminStore();
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isInitialized) {
-      initializeProducts();
-    }
+    if (!isInitialized) initializeProducts();
   }, [isInitialized, initializeProducts]);
 
   const handleStart = () => {
     setIsSpraying(true);
     setTimeout(() => {
         setStep('quiz');
-        setTimeout(() => setIsSpraying(false), 600); 
-    }, 200);
+        setTimeout(() => setIsSpraying(false), 800);
+    }, 400);
   };
 
   const handleRestart = () => {
     setStep('intro');
     setCurrentQuestionIndex(0);
     setAnswers({});
-    setRecommendations([]);
+    setPerfectMatch(null);
   };
 
-  const calculateRecommendations = (finalAnswers: Record<number, string>) => {
-    // Logic based on Q3 (Matter) mainly
+  const calculateRecommendation = (finalAnswers: Record<number, string>) => {
     const matter = finalAnswers[3];
-    let family: OlfactoryFamily | null = null;
-
-    if (matter === 'floral') family = 'Floral';
-    else if (matter === 'woody') family = 'Boisé';
-    else if (matter === 'spicy') family = 'Épicé';
-    else if (matter === 'gourmand') family = 'Gourmand'; // Could also map to Oriental
-
-    // Fallback or refinement based on Q2 (Moment)
-    // if Q2 is 'morning' -> maybe 'Frais/Aquatique' or lighter floral?
-    // if Q2 is 'night' -> Oriental / Intense
+    const aura = finalAnswers[4];
     
-    if (finalAnswers[2] === 'morning' && matter === 'floral') {
-        // Maybe check if we have enough products, otherwise stick to floral
-    }
+    let primaryFamily: OlfactoryFamily | null = null;
+    let secondaryFamily: OlfactoryFamily | null = null;
 
-    let matching = products.filter(p => 
-        family && p.families && p.families.includes(family)
-    );
+    if (matter === 'floral') primaryFamily = 'Floral';
+    else if (matter === 'woody') primaryFamily = 'Boisé';
+    else if (matter === 'spicy') primaryFamily = 'Épicé';
+    else if (matter === 'gourmand') primaryFamily = 'Gourmand'; 
 
-    if (matching.length === 0 && family) {
-        matching = products.filter(p => p.scent && p.scent.toLowerCase().includes(family!.toLowerCase()));
-    }
-    
-    // If we still have no matches (or family was null), try to map from Q1/Q2
-    if (matching.length === 0) {
-        // Fallback random or specific logic
-        // E.g. "morning" -> Frais
-        if (finalAnswers[2] === 'morning') {
-             matching = products.filter(p => p.families && p.families.includes('Frais/Aquatique'));
-        }
-    }
-    
-    // Fallback if absolutely nothing found
-    if (matching.length === 0) {
-        matching = products; 
-    }
+    if (aura === 'mystery') secondaryFamily = 'Oriental';
+    else if (aura === 'elegance') secondaryFamily = 'Chypré';
+    else if (aura === 'boldness') secondaryFamily = 'Cuir';
+    else if (aura === 'softness') secondaryFamily = 'Musc';
 
-    // Select 3 random
+    let matching = products.filter(p => primaryFamily && p.families?.includes(primaryFamily));
+    const refined = matching.filter(p => secondaryFamily && p.families?.includes(secondaryFamily));
+    if (refined.length > 0) matching = refined;
+
+    if (matching.length === 0 && primaryFamily) {
+        matching = products.filter(p => p.scent && p.scent.toLowerCase().includes(primaryFamily!.toLowerCase()));
+    }
+    if (matching.length === 0 && finalAnswers[2] === 'morning') {
+        matching = products.filter(p => p.families?.includes('Frais/Aquatique'));
+    }
+    if (matching.length === 0) matching = products; 
+
     const shuffled = [...matching].sort(() => 0.5 - Math.random());
-    setRecommendations(shuffled.slice(0, 3));
+    setPerfectMatch(shuffled[0] || null);
   };
 
   const handleAnswer = (value: string) => {
@@ -258,72 +215,73 @@ const DiagnosticRitual = () => {
     if (currentQuestionIndex < QUESTIONS.length - 1) {
         setCurrentQuestionIndex(prev => prev + 1);
     } else {
-        calculateRecommendations(newAnswers);
+        calculateRecommendation(newAnswers);
         setStep('loading');
     }
   };
 
-  const handleAddToCart = (id: string) => {
-    const product = products.find(p => p.id === id);
-    if (product) {
-      if (product.stock === 0) {
-        toast.error('Ce produit est actuellement en rupture de stock');
+  const handleAddToCart = () => {
+    if (perfectMatch) {
+      if (perfectMatch.stock === 0) {
+        toast.error('Création actuellement indisponible');
         return;
       }
       addToCart({
-        id: product.id,
-        name: product.name,
-        brand: product.brand,
-        price: product.price,
-        image: product.image || product.image_url || '',
-        scent: product.scent,
-        category: product.category || 'mixte'
+        id: perfectMatch.id,
+        name: perfectMatch.name,
+        brand: perfectMatch.brand,
+        price: perfectMatch.price,
+        image: perfectMatch.image || perfectMatch.image_url || '',
+        scent: perfectMatch.scent,
+        category: perfectMatch.category || 'mixte'
       });
-      toast.success('Ajouté au panier');
+      toast.success('Ajouté à votre sélection');
     }
   };
 
-  const containerHeight = step === 'results' ? 'h-[600px]' : (step === 'intro' ? 'min-h-[160px]' : 'min-h-[380px]');
+  const romanNumerals = ['I', 'II', 'III', 'IV'];
 
   return (
-    <div className="w-full flex justify-center px-4 md:px-0 my-12 animate-fade-up">
-       <motion.div
-        className={`relative w-full max-w-5xl bg-[#0a0a0a] rounded-sm overflow-hidden border border-white/5 shadow-2xl transition-all duration-700 ease-[0.22, 1, 0.36, 1] ${containerHeight}`}
-        layout
-      >
+    <div className="w-full flex justify-center px-4 md:px-6 my-12 md:my-16 selection:bg-[#D4AF37] selection:text-black">
+      {/* Conteneur de taille fixe unifiée : h-[500px] partout pour un rendu massif, sans scroll */}
+      <div className="relative w-full max-w-4xl bg-[#050505] h-[500px] rounded-sm overflow-hidden border border-white/5 shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
+        
         <AnimatePresence mode="wait">
             
-            {/* --- STEP 1: INTRO (Bandeau Luxe) --- */}
+            {/* --- STEP 1: INTRO --- */}
             {step === 'intro' && (
                 <motion.div
                     key="intro"
-                    className="flex flex-col md:flex-row items-center justify-between px-8 py-10 md:py-8 gap-6 md:gap-12"
+                    className="absolute inset-0 flex flex-col items-center justify-center p-6 md:p-16 text-center"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    exit={{ opacity: 0, transition: { duration: 0.3 } }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.8, ease: silkyEase }}
                 >
-                    <div className="flex flex-col items-center md:items-start text-center md:text-left space-y-3">
-                        <span className="text-[10px] font-medium tracking-[0.25em] text-amber-200/60 uppercase">
-                            Diagnostic Olfactif Haute Couture
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-[#D4AF37]/5 blur-[100px] rounded-full pointer-events-none" />
+                    
+                    <div className="relative z-10 space-y-4 md:space-y-6 flex flex-col items-center max-w-lg mx-auto">
+                        <span className="text-[9px] font-bold tracking-[0.4em] text-[#A68A56] uppercase block">
+                            Rituel de Signature
                         </span>
                         
-                        <h2 className="font-serif text-2xl md:text-3xl text-[#F5F5F0] font-light leading-tight">
-                            Trouvez votre signature
+                        <h2 className="font-serif text-3xl md:text-5xl text-white font-normal leading-tight">
+                            Trouvez votre signature olfactive
                         </h2>
                         
-                        <p className="text-xs text-neutral-500 font-light tracking-wide max-w-md">
-                            Une expérience immersive pour révéler le parfum qui capture votre essence.
-                        </p>
-                    </div>
+                        <div className="h-px w-12 bg-[#D4AF37]/50 mx-auto" />
 
-                    <div className="flex-shrink-0">
-                        <Button
+                        <p className="text-xs md:text-sm text-white/40 font-light tracking-wide leading-relaxed">
+                            Confiez-nous vos sens. À travers quatre questions essentielles, notre algorithme olfactif isolera le sillage destinée à devenir votre signature.
+                        </p>
+
+                        <button
                             onClick={handleStart}
-                            className="bg-transparent border border-amber-200/30 text-amber-100 hover:bg-amber-900/10 hover:border-amber-200/60 hover:text-[#D4AF37] px-8 py-6 h-auto rounded-sm font-sans text-xs font-medium tracking-[0.15em] uppercase transition-all duration-500 ease-out group"
+                            className="mt-6 relative overflow-hidden group px-10 py-4 border border-white/20 text-white text-[10px] font-bold tracking-[0.3em] uppercase transition-all duration-500 hover:border-[#D4AF37] hover:text-[#D4AF37]"
                         >
-                            Commencer l'expérience
-                            <span className="ml-3 opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-500">→</span>
-                        </Button>
+                            <span className="relative z-10">Initier le rituel</span>
+                            <div className="absolute inset-0 w-full h-full bg-[#D4AF37]/5 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                        </button>
                     </div>
                 </motion.div>
             )}
@@ -332,49 +290,45 @@ const DiagnosticRitual = () => {
             {step === 'quiz' && (
                 <motion.div
                     key="quiz"
-                    className="absolute inset-0 flex flex-col items-center justify-center p-8 md:p-12 bg-[#0a0a0a]"
+                    className="absolute inset-0 flex flex-col items-center justify-center p-6 md:p-12"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.6, ease: silkyEase }}
                 >
-                     <div className="w-full max-w-2xl">
-                        <div className="flex justify-center mb-8">
-                            <span className="text-[10px] text-neutral-600 tracking-[0.2em] uppercase font-light">
-                                Question {currentQuestionIndex + 1} <span className="text-neutral-800 mx-2">/</span> {QUESTIONS.length}
+                     <div className="w-full max-w-2xl relative z-10">
+                        <div className="text-center mb-8 md:mb-10">
+                            <span className="font-serif text-[#D4AF37] text-sm tracking-[0.2em]">
+                                {romanNumerals[currentQuestionIndex]} <span className="text-white/20 mx-2">/</span> {romanNumerals[QUESTIONS.length - 1]}
                             </span>
                         </div>
                         
                         <AnimatePresence mode="wait">
                           <motion.div
                             key={currentQuestionIndex}
-                            variants={questionVariants}
-                            initial="initial"
-                            animate="animate"
-                            exit="exit"
-                            className="mb-10"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.5, ease: silkyEase }}
+                            className="w-full"
                           >
-                            <h3 className="font-serif text-xl md:text-2xl text-[#F5F5F0] mb-6 text-center font-light">
+                            <h3 className="font-serif text-2xl md:text-3xl text-white mb-6 md:mb-8 text-center leading-tight">
                               {QUESTIONS[currentQuestionIndex].question}
                             </h3>
 
-                            <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-4" initial="initial" animate="animate" exit="exit">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/10 p-px rounded-sm overflow-hidden">
                               {QUESTIONS[currentQuestionIndex].options.map((option) => (
-                                <motion.button
+                                <button
                                   key={option.value}
                                   onClick={() => handleAnswer(option.value)}
-                                  variants={optionVariant}
-                                  className="p-5 rounded-sm border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] hover:border-amber-900/30 text-left transition-all duration-300 group active:scale-[0.99]"
+                                  className="group bg-[#050505] p-4 md:p-6 text-center transition-all duration-500 hover:bg-[#D4AF37]/5 active:bg-[#D4AF37]/10"
                                 >
-                                  <span className="flex justify-between items-center w-full">
-                                    <span className="block text-xs md:text-sm text-neutral-400 group-hover:text-amber-100/90 font-light tracking-wide transition-colors">
-                                      {option.label}
-                                    </span>
-                                    <span className="w-1.5 h-1.5 rounded-full bg-neutral-800 group-hover:bg-[#D4AF37] transition-colors duration-500" />
+                                  <span className="block text-xs md:text-sm text-white/50 group-hover:text-white font-serif tracking-[0.1em] transition-colors duration-500">
+                                    {option.label}
                                   </span>
-                                </motion.button>
+                                </button>
                               ))}
-                            </motion.div>
+                            </div>
                           </motion.div>
                         </AnimatePresence>
                      </div>
@@ -385,77 +339,107 @@ const DiagnosticRitual = () => {
             {step === 'loading' && (
                 <motion.div
                     key="loading"
-                    className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0a]"
+                    className="absolute inset-0 flex items-center justify-center bg-[#050505]"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
+                    transition={{ duration: 0.8 }}
                 >
                     <FillingBottle onComplete={() => setStep('results')} />
                 </motion.div>
             )}
 
-            {/* --- STEP 4: RESULTS --- */}
-            {step === 'results' && (
+            {/* --- STEP 4: RESULT --- */}
+            {step === 'results' && perfectMatch && (
                 <motion.div
                     key="results"
-                    className="absolute inset-0 flex flex-col items-center justify-center p-5 md:p-7 bg-[#0a0a0a] overflow-hidden"
+                    className="absolute inset-0 flex flex-col md:flex-row bg-[#0E0E0E]"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ duration: 0.8 }}
+                    transition={{ duration: 1, ease: silkyEase }}
                 >
-                    <div className="text-center mb-4">
-                        <span className="text-[9px] text-amber-200/50 tracking-[0.25em] uppercase mb-2 block">
-                            Votre signature olfactive
-                        </span>
-                        <h2 className="font-serif text-lg md:text-xl text-[#F5F5F0] mb-1.5 font-light">
-                            Sélection Exclusive
-                        </h2>
-                        <p className="font-sans text-[10px] text-neutral-500 max-w-sm mx-auto font-light leading-relaxed tracking-wide">
-                            Basé sur vos préférences pour {answers[3] === 'floral' ? 'les fleurs blanches' : answers[3] === 'woody' ? 'les bois précieux' : answers[3] === 'spicy' ? 'les épices' : 'la vanille'}.
-                        </p>
+                    {/* Moitié Gauche : Image - Toujours 38% sur mobile pour assurer la fluidité du texte */}
+                    <div className="w-full h-[38%] md:w-1/2 md:h-full relative overflow-hidden flex-shrink-0">
+                        <div className="absolute inset-0 bg-black/10 z-10 pointer-events-none" />
+                        
+                        <img 
+                            src={perfectMatch.image || perfectMatch.image_url} 
+                            alt={perfectMatch.name}
+                            className="w-full h-full object-cover grayscale-[15%] transform hover:scale-105 transition-transform duration-[10s] ease-out"
+                        />
+                        
+                        <div className="hidden md:block absolute inset-0 bg-gradient-to-l from-[#0E0E0E]/60 via-transparent to-transparent z-20 pointer-events-none" />
                     </div>
 
-                    <div className="grid grid-cols-3 gap-3 w-full max-w-[660px] mx-auto mb-4">
-                        {recommendations.map((product, index) => (
-                             <motion.div
-                                key={product.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                             >
-                                <ProductCard
-                                    id={product.id}
-                                    name={product.name}
-                                    brand={product.brand}
-                                    price={product.price}
-                                    image={product.image || product.image_url || ''}
-                                    scent={product.scent}
-                                    stock={product.stock}
-                                    notes={product.notes}
-                                    notes_tete={product.notes_tete}
-                                    notes_coeur={product.notes_coeur}
-                                    notes_fond={product.notes_fond}
-                                    families={product.families}
-                                    onAddToCart={handleAddToCart}
-                                />
-                             </motion.div>
-                        ))}
-                        {recommendations.length === 0 && (
-                             <div className="col-span-3 text-center text-neutral-500 text-sm">
-                                 Aucun résultat trouvé pour cette combinaison.
-                             </div>
-                        )}
-                    </div>
+                    {/* Moitié Droite : Informations - Aucun scroll */}
+                    <div className="w-full h-[62%] md:w-1/2 md:h-full flex flex-col justify-center p-5 md:p-12 relative z-30 bg-[#0E0E0E] overflow-hidden">
+                        <div className="max-w-md my-auto w-full flex flex-col h-full">
+                            <span className="text-[9px] text-[#A68A56] tracking-[0.4em] uppercase mb-1.5 md:mb-3 block font-bold mt-1 md:mt-0">
+                                Votre Signature Olfactive
+                            </span>
+                            
+                            <h2 className="font-serif text-2xl md:text-4xl text-white mb-1 md:mb-2 leading-tight">
+                                {perfectMatch.name}
+                            </h2>
+                            <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] mb-3 md:mb-6">
+                                Par {perfectMatch.brand}
+                            </p>
 
-                    <div className="flex justify-center">
-                        <Button
-                            onClick={handleRestart}
-                            variant="outline"
-                            className="border-white/10 text-neutral-400 hover:text-white hover:bg-white/5 px-5 py-2.5 h-auto rounded-sm bg-transparent text-[10px] tracking-widest uppercase"
-                        >
-                            <RotateCcw className="w-3 h-3 mr-2" />
-                            Recommencer
-                        </Button>
+                            <div className="h-px w-12 bg-white/10 mb-3 md:mb-6" />
+
+                            <div className="space-y-3 md:space-y-4 mb-4 md:mb-8 flex-grow">
+                                <p className="font-serif text-sm text-white/80 leading-relaxed line-clamp-2 md:line-clamp-3">
+                                    {perfectMatch.scent}
+                                </p>
+                                
+                                {perfectMatch.families && perfectMatch.families.length > 0 && (
+                                    <div className="pt-1">
+                                        <p className="text-[8px] uppercase tracking-widest text-[#D4AF37] mb-1">Famille Olfactive</p>
+                                        <p className="text-xs text-white/60 font-light">{perfectMatch.families.join(' • ')}</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Conteneur des Boutons */}
+                            <div className="flex flex-col gap-2 md:gap-3 w-full mt-auto">
+                                {/* Ligne 1 : Acquérir + (Découvrir sur mobile) + Refaire */}
+                                <div className="flex flex-row items-center gap-2 md:gap-3 w-full">
+                                    <button
+                                        onClick={handleAddToCart}
+                                        className="flex-[1.2] md:flex-1 py-3.5 md:py-4 bg-[#D4AF37] text-[#050505] text-[8px] md:text-[10px] font-bold tracking-[0.1em] md:tracking-[0.2em] uppercase rounded-sm hover:bg-white transition-colors flex items-center justify-center gap-1.5 md:gap-2 px-1"
+                                    >
+                                        <Droplets className="w-3.5 h-3.5 flex-shrink-0" />
+                                        <span className="truncate">Acquérir <span className="hidden md:inline">({perfectMatch.price}€)</span></span>
+                                    </button>
+                                    
+                                    {/* Bouton Découvrir - MOBILE SEULEMENT */}
+                                    <button
+                                        onClick={() => navigate(`/product/${perfectMatch.id}`)}
+                                        className="flex-1 md:hidden py-3.5 bg-white/10 text-white text-[8px] font-bold tracking-[0.1em] uppercase rounded-sm hover:bg-white/20 transition-colors flex items-center justify-center truncate px-1"
+                                    >
+                                        Découvrir
+                                    </button>
+
+                                    <button
+                                        onClick={handleRestart}
+                                        className="px-3.5 py-3.5 md:px-4 md:py-4 bg-white/5 text-white/50 hover:bg-white/10 hover:text-white text-[9px] md:text-[10px] tracking-[0.15em] md:tracking-[0.2em] uppercase rounded-sm transition-colors flex items-center justify-center gap-2 flex-shrink-0"
+                                        title="Refaire le diagnostic"
+                                    >
+                                        <RotateCcw className="w-3.5 h-3.5" />
+                                        <span className="hidden md:inline">Refaire</span>
+                                    </button>
+                                </div>
+
+                                {/* Ligne 2 : Bouton Découvrir - DESKTOP SEULEMENT */}
+                                <button
+                                    onClick={() => navigate(`/product/${perfectMatch.id}`)}
+                                    className="hidden md:flex w-full py-4 border border-white/20 text-white text-[10px] font-bold tracking-[0.2em] uppercase rounded-sm hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors items-center justify-center gap-2"
+                                >
+                                    Découvrir la création en détail
+                                </button>
+                            </div>
+
+                        </div>
                     </div>
                 </motion.div>
             )}
@@ -463,7 +447,7 @@ const DiagnosticRitual = () => {
         </AnimatePresence>
 
         {isSpraying && <SprayBurst onComplete={() => {}} />}
-      </motion.div>
+      </div>
     </div>
   );
 };

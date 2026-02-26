@@ -6,6 +6,8 @@ import {
   removeFromCart as supabaseRemoveFromCart,
   clearCart as supabaseClearCart,
   subscribeToCart,
+  updateCartItemsByProductId,
+  removeCartItemsByProductId,
   type CartItemDB,
 } from '@/integrations/supabase/supabase';
 import { supabase } from '@/integrations/supabase/supabase';
@@ -56,7 +58,10 @@ const clearGuestCartStorage = () => {
 const loadGuestPromo = (): { code: string | null; discount: number } => {
   try {
     const raw = localStorage.getItem(GUEST_PROMO_KEY);
-    return raw ? JSON.parse(raw) : { code: null, discount: 0 };
+    if (!raw) return { code: null, discount: 0 };
+    const parsed = JSON.parse(raw);
+    const discount = Number(parsed.discount);
+    return { code: parsed.code || null, discount: Number.isFinite(discount) ? discount : 0 };
   } catch {
     return { code: null, discount: 0 };
   }
@@ -128,9 +133,20 @@ interface CartStoreState {
   // Observers
   getCartItems: () => CartItem[];
   watchCartChanges: (callback: (items: CartItem[]) => void) => () => void;
-  
+
   // Data integrity
   validateCart: (validIds: Set<string>) => void;
+
+  // Sync produit → panier (appelé par l'admin quand un produit est modifié)
+  syncProductToCart: (productId: string, updates: {
+    name?:     string;
+    price?:    number;
+    brand?:    string;
+    image?:    string;
+    scent?:    string;
+    category?: string;
+    stock?:    number;
+  }) => void;
 }
 
 // Helper to calculate cart totals
@@ -654,6 +670,52 @@ export const useCartStore = create<CartStoreState>()((set, get) => ({
     );
 
     return unsubscribe;
+  },
+
+  /**
+   * Synchronise les données d'un produit dans tous les paniers (mémoire + Supabase + localStorage).
+   * Appelé automatiquement par l'admin après chaque modification de produit.
+   */
+  syncProductToCart: (productId, updates) => {
+    // Stock tombé à 0 → retirer le produit de tous les paniers
+    if (updates.stock !== undefined && updates.stock <= 0) {
+      set((state) => {
+        const items = state.cartItems.filter(item => item.productId !== productId);
+        if (items.length === state.cartItems.length) return state;
+        saveGuestCart(items);
+        return { cartItems: items, ...calculateTotals(items) };
+      });
+      // Supabase : suppression en arrière-plan (tous les users)
+      removeCartItemsByProductId(productId).catch(console.error);
+      return;
+    }
+
+    // Construire les champs à mettre à jour dans CartItem
+    const cartUpdates: Partial<CartItem> = {};
+    const dbUpdates: Record<string, unknown> = {};
+
+    if (updates.name     !== undefined) { cartUpdates.name     = updates.name;     dbUpdates.product_name     = updates.name; }
+    if (updates.price    !== undefined) { cartUpdates.price    = updates.price;    dbUpdates.product_price    = updates.price; }
+    if (updates.brand    !== undefined) { cartUpdates.brand    = updates.brand;    dbUpdates.product_brand    = updates.brand; }
+    if (updates.image    !== undefined) { cartUpdates.image    = updates.image;    dbUpdates.product_image    = updates.image ?? null; }
+    if (updates.scent    !== undefined) { cartUpdates.scent    = updates.scent;    dbUpdates.product_scent    = updates.scent ?? null; }
+    if (updates.category !== undefined) { cartUpdates.category = updates.category; dbUpdates.product_category = updates.category ?? null; }
+
+    if (Object.keys(cartUpdates).length === 0) return;
+
+    set((state) => {
+      const hasItem = state.cartItems.some(item => item.productId === productId);
+      if (!hasItem) return state;
+      const items = state.cartItems.map(item =>
+        item.productId === productId ? { ...item, ...cartUpdates } : item
+      );
+      saveGuestCart(items);
+      return { cartItems: items, ...calculateTotals(items) };
+    });
+
+    // Supabase : mise à jour en arrière-plan (tous les users connectés)
+    updateCartItemsByProductId(productId, dbUpdates as Parameters<typeof updateCartItemsByProductId>[1])
+      .catch(console.error);
   },
 
   /**

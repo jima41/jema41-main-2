@@ -9,8 +9,18 @@ import {
   subscribeToProducts,
   batchUpdateFeatured,
   SupabaseError,
+  fetchAllOrders,
+  insertOrder,
+  updateOrderStatusInDB,
+  deleteOrderFromDB,
+  fetchAllAbandonedCarts,
+  upsertAbandonedCart,
+  updateAbandonedCartInDB,
   type ProductRow,
+  type OrderRow,
+  type AbandonedCartRow,
 } from '@/integrations/supabase/supabase';
+import { useCartStore } from '@/store/useCartStore';
 
 // Importer les images
 import perfume1 from '@/assets/perfume-1.jpg';
@@ -108,19 +118,29 @@ export interface OrderItem {
 
 export interface Order {
   id: string;
+  reference?: string;
   userId?: string;
   userName?: string;
   userEmail?: string;
   items: OrderItem[];
   totalAmount: number;
   shippingAddress?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
     address: string;
     city: string;
     postalCode: string;
     country: string;
   };
   timestamp: number;
-  status: 'completed' | 'shipped' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+  // Horodatages de chaque étape (unix ms)
+  pendingAt?: number;
+  confirmedAt?: number;
+  shippedAt?: number;
+  deliveredAt?: number;
   notes?: string;
   promoCode?: string;
   promoDiscount?: number;
@@ -157,6 +177,7 @@ interface AdminStoreState {
   loadFeaturedFromProducts: () => void;
 
   // CRUD Operations for Carts
+  trackAbandonedCart: (cart: AbandonedCart) => void;
   sendRecoveryEmail: (cartId: string, discount: number) => void;
   markRecovered: (cartId: string) => void;
   getFilteredCarts: (filter: 'all' | 'pending' | 'recovered' | 'urgent') => AbandonedCart[];
@@ -172,6 +193,8 @@ interface AdminStoreState {
   // CRUD Operations for Orders
   createOrder: (order: Omit<Order, 'id' | 'timestamp'>) => Order;
   completeOrder: (orderId: string) => void;
+  updateOrderStatus: (orderId: string, status: Order['status']) => void;
+  deleteOrder: (orderId: string) => void;
   deductStock: (items: OrderItem[]) => boolean; // Returns true if all items have enough stock
   getOrdersByUserId: (userId: string) => Order[];
   getOrderHistory: () => Order[];
@@ -298,101 +321,47 @@ const convertProductToRow = (product: Product) => {
 };
 
 // ============================================================================
-// MOCK DATA - ABANDONED CARTS
+// ORDER CONVERSION
 // ============================================================================
 
-const MOCK_ABANDONED_CARTS: AbandonedCart[] = [
-  {
-    id: '1',
-    clientId: 'cli-001',
-    clientName: 'Catherine Rousseau',
-    clientEmail: 'catherine.rousseau@email.com',
-    items: [
-      { productId: '1', productName: 'Éclat Doré 50ml', quantity: 1, price: 129.00 },
-      { productId: '5', productName: 'Fleur de Lys 50ml', quantity: 1, price: 142.00 },
-    ],
-    totalValue: 271.00,
-    abandonedAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
-    recoveryAttempts: 1,
-    lastRecoveryEmail: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    recovered: false,
-    discountOffered: 10,
-  },
-  {
-    id: '2',
-    clientId: 'cli-002',
-    clientName: 'Patrick Fontaine',
-    clientEmail: 'patrick.fontaine@email.com',
-    items: [
-      { productId: '4', productName: 'Bois Noir 50ml', quantity: 2, price: 135.00 },
-    ],
-    totalValue: 270.00,
-    abandonedAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
-    recoveryAttempts: 0,
-    recovered: false,
-  },
-  {
-    id: '3',
-    clientId: 'cli-003',
-    clientName: 'Véronique Blanc',
-    clientEmail: 'veronique.blanc@email.com',
-    items: [
-      { productId: '2', productName: 'Rose Éternelle 50ml', quantity: 1, price: 145.00 },
-      { productId: '3', productName: 'Nuit Mystique 50ml', quantity: 1, price: 98.00 },
-      { productId: '6', productName: 'Essense Légère 50ml', quantity: 1, price: 112.00 },
-    ],
-    totalValue: 355.00,
-    abandonedAt: new Date(Date.now() - 120 * 60 * 60 * 1000),
-    recoveryAttempts: 3,
-    lastRecoveryEmail: new Date(Date.now() - 48 * 60 * 60 * 1000),
-    recovered: false,
-  },
-  {
-    id: '4',
-    clientId: 'cli-004',
-    clientName: 'Michel Durand',
-    clientEmail: 'michel.durand@email.com',
-    items: [
-      { productId: '1', productName: 'Éclat Doré 50ml', quantity: 1, price: 129.00 },
-    ],
-    totalValue: 129.00,
-    abandonedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
-    recoveryAttempts: 2,
-    lastRecoveryEmail: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
-    recovered: true,
-    recoveryDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-    discountOffered: 15,
-  },
-  {
-    id: '5',
-    clientId: 'cli-005',
-    clientName: 'Isabelle Mercier',
-    clientEmail: 'isabelle.mercier@email.com',
-    items: [
-      { productId: '5', productName: 'Fleur de Lys 50ml', quantity: 1, price: 142.00 },
-      { productId: '2', productName: 'Rose Éternelle 50ml', quantity: 1, price: 145.00 },
-    ],
-    totalValue: 287.00,
-    abandonedAt: new Date(Date.now() - 18 * 60 * 60 * 1000),
-    recoveryAttempts: 0,
-    recovered: false,
-  },
-  {
-    id: '6',
-    clientId: 'cli-006',
-    clientName: 'Laurent Girard',
-    clientEmail: 'laurent.girard@email.com',
-    items: [
-      { productId: '3', productName: 'Nuit Mystique 50ml', quantity: 1, price: 98.00 },
-    ],
-    totalValue: 98.00,
-    abandonedAt: new Date(Date.now() - 72 * 60 * 60 * 1000),
-    recoveryAttempts: 2,
-    lastRecoveryEmail: new Date(Date.now() - 48 * 60 * 60 * 1000),
-    recovered: false,
-    discountOffered: 15,
-  },
-];
+const convertOrderRowToOrder = (row: OrderRow): Order => ({
+  id:              row.id,
+  reference:       row.reference       ?? undefined,
+  userId:          row.user_id         ?? undefined,
+  userName:        row.user_name       ?? undefined,
+  userEmail:       row.user_email      ?? undefined,
+  items:           (row.items as OrderItem[]) || [],
+  totalAmount:     row.total_amount,
+  shippingAddress: row.shipping_address ?? undefined,
+  status:          row.status as Order['status'],
+  timestamp:       row.timestamp,
+  pendingAt:       row.pending_at      ?? undefined,
+  confirmedAt:     row.confirmed_at    ?? undefined,
+  shippedAt:       row.shipped_at      ?? undefined,
+  deliveredAt:     row.delivered_at    ?? undefined,
+  notes:           row.notes           ?? undefined,
+  promoCode:       row.promo_code      ?? undefined,
+  promoDiscount:   row.promo_discount  ?? undefined,
+});
+
+// ============================================================================
+// ABANDONED CART CONVERSION
+// ============================================================================
+
+const convertAbandonedCartRowToCart = (row: AbandonedCartRow): AbandonedCart => ({
+  id:                  row.id,
+  clientId:            row.client_id    ?? '',
+  clientName:          row.client_name  ?? 'Client inconnu',
+  clientEmail:         row.client_email ?? '',
+  items:               (row.items as AbandonedCartItem[]) || [],
+  totalValue:          row.total_value,
+  abandonedAt:         new Date(row.abandoned_at),
+  recoveryAttempts:    row.recovery_attempts,
+  lastRecoveryEmail:   row.last_recovery_email ? new Date(row.last_recovery_email) : undefined,
+  recovered:           row.recovered,
+  recoveryDate:        row.recovery_date ? new Date(row.recovery_date) : undefined,
+  discountOffered:     row.discount_offered ?? undefined,
+});
 
 // ============================================================================
 // ZUSTAND STORE WITH SUPABASE INTEGRATION
@@ -402,7 +371,7 @@ let realtimeSubscription: any = null;
 
 export const useAdminStore = create<AdminStoreState>()((set, get) => ({
   // Initial State
-  abandonedCarts: MOCK_ABANDONED_CARTS,
+  abandonedCarts: [],
   products: [],
   productsLoading: false,
   productsError: null,
@@ -425,13 +394,30 @@ export const useAdminStore = create<AdminStoreState>()((set, get) => ({
 
     try {
       set({ productsLoading: true, productsError: null });
-      console.log('📥 Récupération des produits depuis Supabase...');
-      const rows = await fetchAllProducts();
+      console.log('📥 Récupération des produits et commandes depuis Supabase...');
+
+      // Charger produits, commandes et paniers abandonnés en parallèle
+      const [rows, orderRows, cartRows] = await Promise.all([
+        fetchAllProducts(),
+        fetchAllOrders().catch((err) => {
+          console.warn('⚠️ Impossible de charger les commandes (table manquante ?):', err?.message);
+          return [] as OrderRow[];
+        }),
+        fetchAllAbandonedCarts().catch((err) => {
+          console.warn('⚠️ Impossible de charger les paniers abandonnés (table manquante ?):', err?.message);
+          return [] as AbandonedCartRow[];
+        }),
+      ]);
+
       console.log(`📦 ${rows.length} produits reçus de Supabase`);
-      
+      console.log(`🛒 ${orderRows.length} commandes reçues de Supabase`);
+      console.log(`🛍️ ${cartRows.length} paniers abandonnés reçus de Supabase`);
+
       const products = rows.map((row, index) => convertProductRowToProduct(row, index));
+      const orders = orderRows.map(convertOrderRowToOrder);
+      const abandonedCarts = cartRows.map(convertAbandonedCartRowToCart);
       console.log(`✅ ${products.length} produits convertis avec images`);
-      
+
       // Log du premier produit pour vérifier les images
       if (products.length > 0) {
         console.log('🔍 Premier produit converti:', {
@@ -440,9 +426,11 @@ export const useAdminStore = create<AdminStoreState>()((set, get) => ({
           image_url: products[0].image_url?.substring?.(0, 100),
         });
       }
-      
+
       set({
         products,
+        orders,
+        abandonedCarts,
         productsLoading: false,
         productsError: null,
         isInitialized: true,
@@ -458,10 +446,10 @@ export const useAdminStore = create<AdminStoreState>()((set, get) => ({
       }
 
       console.log('✅ Produits chargés depuis Supabase:', products.length);
+      console.log('✅ Commandes chargées depuis Supabase:', orders.length);
     } catch (error) {
-      const message = error instanceof SupabaseError ? error.message : 'Erreur de chargement des produits';
       console.error('❌ Erreur initializeProducts:', error);
-      
+
       // Fallback to default products
       console.log('🔄 Utilisation des produits par défaut...');
       const defaultProducts = DEFAULT_PRODUCTS.map((product, index) => ({
@@ -476,14 +464,14 @@ export const useAdminStore = create<AdminStoreState>()((set, get) => ({
         is_featured: false,
         featured_order: 0,
       }));
-      
+
       set({
         products: defaultProducts,
         productsLoading: false,
         productsError: null,
         isInitialized: true,
       });
-      
+
       console.log('✅ Produits par défaut chargés:', defaultProducts.length);
     }
   },
@@ -629,32 +617,68 @@ export const useAdminStore = create<AdminStoreState>()((set, get) => ({
 
   // ========== ABANDONED CARTS OPERATIONS ==========
 
-  sendRecoveryEmail: (cartId: string, discount: number) =>
+  trackAbandonedCart: (cart: AbandonedCart) => {
+    set((state) => {
+      const exists = state.abandonedCarts.some((c) => c.id === cart.id);
+      return {
+        abandonedCarts: exists
+          ? state.abandonedCarts.map((c) => (c.id === cart.id ? cart : c))
+          : [...state.abandonedCarts, cart],
+      };
+    });
+    // Persister en base (fire-and-forget)
+    upsertAbandonedCart({
+      id:              cart.id,
+      clientId:        cart.clientId,
+      clientName:      cart.clientName,
+      clientEmail:     cart.clientEmail,
+      items:           cart.items,
+      totalValue:      cart.totalValue,
+      abandonedAt:     typeof cart.abandonedAt === 'string'
+                         ? new Date(cart.abandonedAt).getTime()
+                         : (cart.abandonedAt as Date).getTime(),
+      recoveryAttempts: cart.recoveryAttempts,
+      recovered:       cart.recovered,
+    }).catch((err) => console.warn('⚠️ upsertAbandonedCart:', err?.message));
+  },
+
+  sendRecoveryEmail: (cartId: string, discount: number) => {
+    const now = Date.now();
     set((state) => ({
       abandonedCarts: state.abandonedCarts.map((cart) =>
         cart.id === cartId
           ? {
               ...cart,
               recoveryAttempts: cart.recoveryAttempts + 1,
-              lastRecoveryEmail: new Date(),
+              lastRecoveryEmail: new Date(now),
               discountOffered: discount,
             }
           : cart
       ),
-    })),
+    }));
+    // Persister en base (fire-and-forget)
+    updateAbandonedCartInDB(cartId, {
+      recovery_attempts:   (get().abandonedCarts.find((c) => c.id === cartId)?.recoveryAttempts ?? 0),
+      last_recovery_email: now,
+      discount_offered:    discount,
+    }).catch((err) => console.warn('⚠️ updateAbandonedCartInDB (email):', err?.message));
+  },
 
-  markRecovered: (cartId: string) =>
+  markRecovered: (cartId: string) => {
+    const now = Date.now();
     set((state) => ({
       abandonedCarts: state.abandonedCarts.map((cart) =>
         cart.id === cartId
-          ? {
-              ...cart,
-              recovered: true,
-              recoveryDate: new Date(),
-            }
+          ? { ...cart, recovered: true, recoveryDate: new Date(now) }
           : cart
       ),
-    })),
+    }));
+    // Persister en base (fire-and-forget)
+    updateAbandonedCartInDB(cartId, {
+      recovered:     true,
+      recovery_date: now,
+    }).catch((err) => console.warn('⚠️ updateAbandonedCartInDB (recovered):', err?.message));
+  },
 
   getFilteredCarts: (filter: 'all' | 'pending' | 'recovered' | 'urgent') => {
     const state = get();
@@ -678,23 +702,75 @@ export const useAdminStore = create<AdminStoreState>()((set, get) => ({
   // ========== ORDERS OPERATIONS ==========
 
   createOrder: (orderData) => {
+    const now = Date.now();
     const order: Order = {
       ...orderData,
-      id: `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      timestamp: Date.now(),
+      id: `ORD-${now}-${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: now,
+      pendingAt: now,
     };
     set((state) => ({
       orders: [...state.orders, order],
     }));
+    // Persister en base (fire-and-forget)
+    insertOrder({
+      id:              order.id,
+      reference:       order.reference,
+      userId:          order.userId,
+      userName:        order.userName,
+      userEmail:       order.userEmail,
+      items:           order.items,
+      totalAmount:     order.totalAmount,
+      shippingAddress: order.shippingAddress,
+      status:          order.status,
+      timestamp:       order.timestamp,
+      pendingAt:       order.pendingAt,
+      notes:           order.notes,
+      promoCode:       order.promoCode,
+      promoDiscount:   order.promoDiscount,
+    }).catch((err) => {
+      console.error('❌ Erreur sauvegarde commande Supabase:', err);
+    });
     return order;
   },
 
   completeOrder: (orderId: string) =>
     set((state) => ({
       orders: state.orders.map((order) =>
-        order.id === orderId ? { ...order, status: 'completed' } : order
+        order.id === orderId ? { ...order, status: 'delivered' } : order
       ),
     })),
+
+  updateOrderStatus: (orderId: string, status: Order['status']) => {
+    const now = Date.now();
+    const tsField: Partial<Record<'confirmedAt' | 'shippedAt' | 'deliveredAt', number>> =
+      status === 'confirmed' ? { confirmedAt: now }
+      : status === 'shipped'   ? { shippedAt: now }
+      : status === 'delivered' ? { deliveredAt: now }
+      : {};
+    set((state) => ({
+      orders: state.orders.map((order) =>
+        order.id === orderId ? { ...order, status, ...tsField } : order
+      ),
+    }));
+    // Persister en base (fire-and-forget)
+    updateOrderStatusInDB(orderId, status, {
+      confirmed_at: tsField.confirmedAt,
+      shipped_at:   tsField.shippedAt,
+      delivered_at: tsField.deliveredAt,
+    }).catch((err) => {
+      console.error('❌ Erreur mise à jour statut commande Supabase:', err);
+    });
+  },
+
+  deleteOrder: (orderId: string) => {
+    set((state) => ({
+      orders: state.orders.filter((o) => o.id !== orderId),
+    }));
+    deleteOrderFromDB(orderId).catch((err) => {
+      console.error('❌ Erreur suppression commande Supabase:', err);
+    });
+  },
 
   deductStock: (items: OrderItem[]) => {
     const state = get();
@@ -702,25 +778,35 @@ export const useAdminStore = create<AdminStoreState>()((set, get) => ({
     // Check if all items have enough stock
     for (const item of items) {
       const product = state.products.find((p) => p.id === item.productId);
-      if (!product || product.stock < item.quantity) {
+      if (!product || (product.stock ?? 0) < item.quantity) {
         return false;
       }
     }
 
-    // Deduct stock
+    // Deduct stock locally (optimistic)
+    const updatedProducts: { id: string; newStock: number }[] = [];
     set((state) => ({
       products: state.products.map((product) => {
         const item = items.find((i) => i.productId === product.id);
         if (item) {
+          const newStock = Math.max(0, (product.stock ?? 0) - item.quantity);
+          updatedProducts.push({ id: product.id, newStock });
           return {
             ...product,
-            stock: Math.max(0, product.stock - item.quantity),
-            monthlySales: product.monthlySales + item.quantity,
+            stock: newStock,
+            monthlySales: (product.monthlySales ?? 0) + item.quantity,
           };
         }
         return product;
       }),
     }));
+
+    // Sync each updated product stock to Supabase (fire-and-forget)
+    for (const { id, newStock } of updatedProducts) {
+      get().updateProductStock(id, newStock).catch((err) => {
+        console.error('❌ Erreur sync stock Supabase:', id, err);
+      });
+    }
 
     return true;
   },
@@ -805,6 +891,17 @@ export const useAdminStore = create<AdminStoreState>()((set, get) => ({
       newProducts[productIndex] = updatedProduct;
       set({ products: newProducts });
       console.log('📝 Produit mis à jour localement:', id);
+
+      // Propager les changements dans tous les paniers ouverts
+      useCartStore.getState().syncProductToCart(id, {
+        name:     updates.name,
+        price:    updates.price,
+        brand:    updates.brand,
+        image:    updates.image,
+        scent:    updates.scent,
+        category: updates.category,
+        stock:    updates.stock,
+      });
 
       // Ensuite, synchroniser avec Supabase
       const result = await supabaseUpdate(id, data);
@@ -979,6 +1076,7 @@ export const useAbandonedCarts = () => {
   const store = useAdminStore();
   return {
     carts: store.abandonedCarts,
+    trackAbandonedCart: store.trackAbandonedCart,
     sendRecoveryEmail: store.sendRecoveryEmail,
     markRecovered: store.markRecovered,
     getStatistics: store.getStatistics,
@@ -1008,6 +1106,8 @@ export const useOrderManagement = () => {
     orders: store.orders,
     createOrder: store.createOrder,
     completeOrder: store.completeOrder,
+    updateOrderStatus: store.updateOrderStatus,
+    deleteOrder: store.deleteOrder,
     deductStock: store.deductStock,
     getOrdersByUserId: store.getOrdersByUserId,
     getOrderHistory: store.getOrderHistory,

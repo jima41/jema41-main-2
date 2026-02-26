@@ -65,7 +65,7 @@ const nobleLetterVariants = {
     filter: 'blur(0px)', 
     transition: { 
       duration: 0.4, 
-      ease: 'easeOut' 
+      ease: 'easeOut' as const
     },
   },
 };
@@ -103,28 +103,41 @@ const Hero = () => {
 
   return (
     <section
-      className="grid grid-cols-1 grid-rows-1 h-[55dvh] min-h-[400px] sm:h-[650px] w-full relative isolate bg-[#FAF9F7] overflow-hidden"
+      className="grid grid-cols-1 grid-rows-1 h-[75dvh] min-h-[500px] sm:h-[650px] w-full relative isolate bg-[#FAF9F7] overflow-hidden"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Background Image */}
-      <motion.img
-        src="images/Hero-section.webp"
-        alt="Collection Parfum Rayha"
-        className="absolute inset-0 w-full h-full object-cover z-0 scale-[1.03]"
+      {/* Background Image (Responsive) */}
+      <motion.div
+        className="absolute inset-0 w-full h-full z-0 md:scale-[1.03]"
         style={{ 
           x: springX, 
           y: springY,
           mixBlendMode: 'multiply' 
         }}
-        loading="eager"
-      />
+      >
+        <picture>
+          {/* Image chargée uniquement sur mobile (écrans < 768px) */}
+          <source media="(max-width: 767px)" srcSet="/images/Hero-section-mobile.webp" />
+          {/* Image par défaut (Desktop/Tablette) */}
+          <img
+            src="/images/Hero-section.webp"
+            alt="Collection Parfum Rayha"
+            className="w-full h-full object-cover object-[100%_50%] md:object-center"
+            loading="eager"
+            fetchPriority="high"
+            decoding="sync"
+          />
+        </picture>
+      </motion.div>
 
-      {/* Vignette Layer */}
-      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-white/50 via-white/20 to-transparent pointer-events-none" />
+      {/* MODIFICATION ICI : Le dégradé part du HAUT (bg-gradient-to-b) sur mobile pour protéger le texte, 
+          puis repart de la gauche (bg-gradient-to-r) sur Desktop */}
+      <div className="absolute inset-0 z-[1] hidden md:block md:bg-gradient-to-r md:from-white/50 md:via-white/20 md:to-transparent pointer-events-none" />
 
-      {/* Content Layer */}
-      <div className="col-start-1 row-start-1 w-full h-full z-10 flex items-center justify-start px-6 md:px-12 lg:px-24">
+      {/* MODIFICATION ICI : Alignement en HAUT sur mobile (items-start pt-28) pour laisser le flacon visible en bas,
+          et toujours centré sur Desktop (md:items-center md:pt-0) */}
+      <div className="col-start-1 row-start-1 w-full h-full z-10 flex items-start pt-28 md:items-center md:pt-0 justify-start px-6 md:px-12 lg:px-24">
         <motion.div
           className="max-w-2xl text-left"
           variants={heroContainerVariants}
@@ -134,7 +147,7 @@ const Hero = () => {
           {/* Brand Tag */}
           <motion.span
             variants={blurRevealVariants}
-            className="inline-block text-[10px] sm:text-xs font-semibold text-[#A68A56] mb-4 sm:mb-5 tracking-[0.4em] uppercase"
+            className="inline-block text-[10px] sm:text-xs font-semibold text-[#A68A56] mb-3 sm:mb-5 tracking-[0.4em] uppercase"
           >
             Rayha Store — Haute Parfumerie
           </motion.span>
@@ -142,14 +155,14 @@ const Hero = () => {
           {/* Title */}
           <motion.h1
             variants={blurRevealVariants}
-            className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-serif leading-tight mb-1 tracking-tight text-[#0E0E0E]"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-serif leading-tight mb-1 tracking-tight text-[#0E0E0E]"
           >
             L'Art de la
           </motion.h1>
 
           <motion.div variants={goldRevealVariants} className="mb-4 sm:mb-10">
             <span
-              className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-serif leading-tight"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-serif leading-tight"
               style={{
                 backgroundImage: 'linear-gradient(to right bottom, #DFBD69, #D4AF37, #B8860B)',
                 backgroundClip: 'text',
@@ -162,10 +175,10 @@ const Hero = () => {
             </span>
           </motion.div>
 
-          {/* Description - CORRIGÉE : Le "hidden sm:block" a été retiré et la taille ajustée */}
+          {/* Description */}
           <motion.p
             variants={blurRevealVariants}
-            className="text-[11px] sm:text-lg font-light leading-relaxed text-gray-700 mb-8 sm:mb-12 max-w-[280px] sm:max-w-md"
+            className="text-[12px] sm:text-lg font-light leading-relaxed text-gray-800 mb-6 sm:mb-12 max-w-[280px] sm:max-w-md"
           >
             Une signature olfactive unique, conçue pour ceux qui cherchent l'exceptionnel.
           </motion.p>
@@ -174,7 +187,7 @@ const Hero = () => {
           <motion.button
             variants={luxuryButtonSlideVariants} 
             onClick={handleExplore}
-            className="group relative overflow-hidden rounded-full flex items-center justify-center"
+            className="group relative overflow-hidden rounded-full flex items-center justify-center w-full sm:w-auto"
             style={{
               backgroundColor: "#0E0E0E",
               border: "1px solid rgba(255, 255, 255, 0.15)",
@@ -188,13 +201,13 @@ const Hero = () => {
             transition={{ duration: 0.8, ease: silkyEase }}
           >
             <motion.div 
-              className="relative z-10 flex items-center justify-center gap-2 sm:gap-4 px-6 py-3 sm:px-12 sm:py-5"
+              className="relative z-10 flex items-center justify-center gap-2 sm:gap-4 px-6 py-4 sm:px-12 sm:py-5 w-full"
               initial={{ color: "#FFFFFF" }}
               whileHover={{ color: "#D4AF37" }}
               transition={{ duration: 0.6, ease: silkyEase }}
             >
               <motion.span 
-                className="font-montserrat text-[8.5px] sm:text-[11px] font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase inline-block"
+                className="font-montserrat text-[10px] sm:text-[11px] font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase inline-block"
                 variants={buttonTextContainerVariants} 
               >
                 {buttonText.split("").map((char, index) => (
@@ -209,7 +222,7 @@ const Hero = () => {
               </motion.span>
               
               <motion.svg 
-                className="w-2.5 h-2.5 sm:w-3 sm:h-3" 
+                className="w-3 h-3 sm:w-3 sm:h-3" 
                 viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
                 initial={{ x: 0, opacity: 0.8 }}
                 whileHover={{ x: 5, opacity: 1 }}
@@ -223,8 +236,13 @@ const Hero = () => {
         </motion.div>
       </div>
 
-      {/* Bottom fade to content */}
-      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#FAF9F7] via-[#FAF9F7]/60 to-transparent pointer-events-none" />
+      {/* Bottom fade to background */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-28 md:h-40 pointer-events-none z-[5]"
+        style={{
+          background: 'linear-gradient(to top, #F9F7F2 0%, #F9F7F2 15%, rgba(249,247,242,0.85) 40%, rgba(249,247,242,0.4) 65%, transparent 100%)',
+        }}
+      />
     </section>
   );
 };
