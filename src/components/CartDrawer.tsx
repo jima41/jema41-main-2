@@ -150,7 +150,7 @@ const CartDrawer = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: 
               <p className="text-[10px] md:text-xs text-white/60 mb-3 uppercase tracking-widest text-center">
                 Plus que <span className="text-[#D4AF37] font-bold">{remainingForFreeShipping.toFixed(2)}€</span> pour la livraison offerte
               </p>
-              <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-[#D4AF37] transition-all duration-700 ease-out"
                   style={{ width: `${progressPercentage}%` }}
@@ -207,7 +207,7 @@ const CartDrawer = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: 
                             <div className="w-10 h-12 bg-white/5 rounded-sm" />
                           )}
                           <div className="min-w-0">
-                            <p className="text-[8px] text-white/40 uppercase tracking-widest truncate">{p.brand}</p>
+                            <p className="text-[10px] text-white/40 uppercase tracking-widest truncate">{p.brand}</p>
                             <p className="text-xs text-white/80 font-serif truncate">{p.name}</p>
                           </div>
                         </div>
@@ -216,11 +216,11 @@ const CartDrawer = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: 
 
                     <div className="flex items-center justify-between pt-2 border-t border-white/5">
                       <div className="flex items-center gap-3 border border-white/10 rounded-sm">
-                        <button onClick={() => onUpdateQuantity(item.id, item.quantity - 1)} className="p-2 text-white/50 hover:text-white transition-colors" disabled={item.quantity <= 1}>
+                        <button onClick={() => onUpdateQuantity(item.id, item.quantity - 1)} className="p-3 text-white/50 hover:text-white transition-colors" disabled={item.quantity <= 1}>
                           <Minus className="w-3 h-3" />
                         </button>
                         <span className="text-xs font-medium w-4 text-center">{item.quantity}</span>
-                        <button onClick={() => onUpdateQuantity(item.id, item.quantity + 1)} className="p-2 text-white/50 hover:text-white transition-colors">
+                        <button onClick={() => onUpdateQuantity(item.id, item.quantity + 1)} className="p-3 text-white/50 hover:text-white transition-colors">
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
@@ -229,12 +229,12 @@ const CartDrawer = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: 
                   </div>
                 ) : (
                   /* ── AFFICHAGE NORMAL ── */
-                  <div className="flex gap-4">
-                    <img src={item.image} alt={item.name} className="w-20 h-24 object-cover rounded-sm grayscale-[20%]" />
-                    <div className="flex-1 flex flex-col justify-between py-1">
+                  <div className="flex gap-3">
+                    <img src={item.image} alt={item.name} className="w-16 h-20 md:w-20 md:h-24 object-cover rounded-sm grayscale-[20%] flex-shrink-0" />
+                    <div className="flex-1 flex flex-col justify-between py-1 min-w-0">
                       <div className="flex justify-between items-start">
-                        <div>
-                          <p className="text-[9px] text-[#A68A56] uppercase tracking-[0.2em] mb-1">{item.brand}</p>
+                        <div className="min-w-0 pr-1">
+                          <p className="text-[10px] text-[#A68A56] uppercase tracking-[0.15em] mb-1">{item.brand}</p>
                           <h3 className="font-serif text-white text-base leading-tight pr-2">{item.name}</h3>
                           {item.volume && <p className="text-[10px] text-white/40 mt-1">{item.volume}</p>}
                         </div>
@@ -245,11 +245,11 @@ const CartDrawer = ({ isOpen, onClose, items, onUpdateQuantity, onRemoveItem }: 
                       
                       <div className="flex items-center justify-between mt-4">
                         <div className="flex items-center gap-3 border border-white/10 rounded-sm">
-                          <button onClick={() => onUpdateQuantity(item.id, item.quantity - 1)} className="p-2 text-white/50 hover:text-white transition-colors" disabled={item.quantity <= 1}>
+                          <button onClick={() => onUpdateQuantity(item.id, item.quantity - 1)} className="p-3 text-white/50 hover:text-white transition-colors" disabled={item.quantity <= 1}>
                             <Minus className="w-3 h-3" />
                           </button>
                           <span className="text-xs font-medium w-4 text-center">{item.quantity}</span>
-                          <button onClick={() => onUpdateQuantity(item.id, item.quantity + 1)} className="p-2 text-white/50 hover:text-white transition-colors">
+                          <button onClick={() => onUpdateQuantity(item.id, item.quantity + 1)} className="p-3 text-white/50 hover:text-white transition-colors">
                             <Plus className="w-3 h-3" />
                           </button>
                         </div>

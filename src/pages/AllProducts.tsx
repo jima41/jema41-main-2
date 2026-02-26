@@ -182,7 +182,7 @@ const AllProducts = () => {
           {/* Breadcrumb / Back Button */}
           <button
             onClick={() => navigate('/')}
-            className="inline-flex items-center gap-2 text-[#1a1a1a]/50 hover:text-[#1a1a1a] transition-colors mb-4 md:mb-6 text-[10px] md:text-xs tracking-[0.15em] uppercase font-medium min-h-10"
+            className="inline-flex items-center gap-2 text-[#1a1a1a]/50 hover:text-[#1a1a1a] transition-colors mb-4 md:mb-6 text-[10px] md:text-xs tracking-[0.15em] uppercase font-medium min-h-[44px]"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             Retour à l'accueil
@@ -210,7 +210,7 @@ const AllProducts = () => {
               animate="visible"
               variants={staggerContainer}
             >
-              <motion.span variants={fadeUpItem} className="text-[9px] md:text-[10px] lg:text-xs text-[#D4AF37] uppercase tracking-[0.3em] mb-1.5 md:mb-2 block font-medium">
+              <motion.span variants={fadeUpItem} className="text-[10px] lg:text-xs text-[#D4AF37] uppercase tracking-[0.25em] mb-1.5 md:mb-2 block font-medium">
                 La Collection
               </motion.span>
               <motion.h1 variants={fadeUpItem} className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-normal mb-1.5 md:mb-3 text-white drop-shadow-lg">
@@ -242,7 +242,7 @@ const AllProducts = () => {
               transition={{ duration: 0.5, ease: silkyEase }}
             >
               <motion.div
-                className="relative z-10 flex items-center gap-2 px-5 py-2.5 md:py-3"
+                className="relative z-10 flex items-center gap-2 px-5 py-3"
                 initial={{ color: "#FFFFFF" }}
                 whileHover={{ color: "#D4AF37" }}
                 transition={{ duration: 0.4, ease: silkyEase }}
@@ -262,7 +262,7 @@ const AllProducts = () => {
             
             {/* Results Count - Right side */}
             <motion.div 
-              className="text-[10px] md:text-xs text-[#1a1a1a]/60 uppercase tracking-widest font-medium whitespace-nowrap"
+              className="text-xs text-[#1a1a1a]/60 uppercase tracking-widest font-medium whitespace-nowrap"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8, duration: 0.5 }}

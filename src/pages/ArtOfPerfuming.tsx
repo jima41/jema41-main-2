@@ -129,7 +129,7 @@ const ArtOfPerfuming = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
               {/* Point 1 : La Distance */}
-              <motion.div variants={fadeUpItem} className="bg-white p-8 md:p-10 rounded-2xl border border-[#EAEAEA] shadow-sm text-center relative overflow-hidden group">
+              <motion.div variants={fadeUpItem} className="bg-white p-5 sm:p-8 md:p-10 rounded-2xl border border-[#EAEAEA] shadow-sm text-center relative overflow-hidden group">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 <div className="w-12 h-12 bg-[#F9F9F9] rounded-full flex items-center justify-center mx-auto mb-6 text-[#A68A56]">
                   <Wind className="w-5 h-5" />
@@ -141,7 +141,7 @@ const ArtOfPerfuming = () => {
               </motion.div>
 
               {/* Point 2 : Les Points de Pulsation */}
-              <motion.div variants={fadeUpItem} className="bg-white p-8 md:p-10 rounded-2xl border border-[#EAEAEA] shadow-sm text-center relative overflow-hidden group">
+              <motion.div variants={fadeUpItem} className="bg-white p-5 sm:p-8 md:p-10 rounded-2xl border border-[#EAEAEA] shadow-sm text-center relative overflow-hidden group">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 <div className="w-12 h-12 bg-[#F9F9F9] rounded-full flex items-center justify-center mx-auto mb-6 text-[#A68A56]">
                   <Droplets className="w-5 h-5" />
@@ -153,7 +153,7 @@ const ArtOfPerfuming = () => {
               </motion.div>
 
               {/* Point 3 : Le Geste à Bannir */}
-              <motion.div variants={fadeUpItem} className="bg-white p-8 md:p-10 rounded-2xl border border-[#EAEAEA] shadow-sm text-center relative overflow-hidden group">
+              <motion.div variants={fadeUpItem} className="bg-white p-5 sm:p-8 md:p-10 rounded-2xl border border-[#EAEAEA] shadow-sm text-center relative overflow-hidden group">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 <div className="w-12 h-12 bg-[#F9F9F9] rounded-full flex items-center justify-center mx-auto mb-6 text-[#A68A56]">
                   <Sparkles className="w-5 h-5" />

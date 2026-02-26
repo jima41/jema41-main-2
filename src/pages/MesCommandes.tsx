@@ -144,23 +144,23 @@ const OrderCard = ({ order, index }: { order: Order; index: number }) => {
       >
         <div className="flex items-center gap-6">
           <div>
-            <p className="text-[9px] text-white/30 uppercase tracking-[0.2em] mb-1">Référence</p>
+            <p className="text-[10px] text-white/30 uppercase tracking-[0.2em] mb-1">Référence</p>
             <p className="text-xs font-mono text-white/70 tracking-tighter">
               {order.reference ?? `#${order.id.slice(0, 8).toUpperCase()}`}
             </p>
           </div>
           <div>
-            <p className="text-[9px] text-white/30 uppercase tracking-[0.2em] mb-1">Date</p>
+            <p className="text-[10px] text-white/30 uppercase tracking-[0.2em] mb-1">Date</p>
             <p className="text-xs text-white/70">{formatDate(order.timestamp)}</p>
           </div>
           <div>
-            <p className="text-[9px] text-white/30 uppercase tracking-[0.2em] mb-1">Total</p>
+            <p className="text-[10px] text-white/30 uppercase tracking-[0.2em] mb-1">Total</p>
             <p className="text-xs font-serif text-[#D4AF37]">{order.totalAmount.toFixed(2)} €</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className={`text-[9px] uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border ${cfg.bg} ${cfg.color} font-bold`}>
+          <span className={`text-[10px] uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border ${cfg.bg} ${cfg.color} font-bold`}>
             {cfg.label}
           </span>
           <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.25 }}>
@@ -184,7 +184,7 @@ const OrderCard = ({ order, index }: { order: Order; index: number }) => {
 
               {/* Suivi de statut */}
               <div>
-                <p className="text-[9px] text-white/30 uppercase tracking-[0.25em] mb-6">Suivi de commande</p>
+                <p className="text-[10px] text-white/30 uppercase tracking-[0.25em] mb-6">Suivi de commande</p>
                 {cancelled ? (
                   <div className="flex items-center gap-3 text-sm text-white/40">
                     <X className="w-4 h-4 text-red-400/70" />
@@ -212,7 +212,7 @@ const OrderCard = ({ order, index }: { order: Order; index: number }) => {
                             <div className="text-center mb-1 min-h-[28px] flex flex-col items-center justify-end">
                               {fmt ? (
                                 <>
-                                  <p className="text-[9px] font-bold text-[#D4AF37]/90 leading-none">{fmt.hm}</p>
+                                  <p className="text-[10px] font-bold text-[#D4AF37]/90 leading-none">{fmt.hm}</p>
                                   <p className="text-[8px] text-white/30 mt-0.5 leading-none">{fmt.date}</p>
                                 </>
                               ) : (
@@ -235,7 +235,7 @@ const OrderCard = ({ order, index }: { order: Order; index: number }) => {
 
                             {/* Label sous l'icône */}
                             <div className="text-center hidden sm:block mt-1">
-                              <p className={`text-[9px] uppercase tracking-[0.15em] font-bold ${done ? 'text-[#D4AF37]' : 'text-white/20'}`}>
+                              <p className={`text-[10px] uppercase tracking-[0.15em] font-bold ${done ? 'text-[#D4AF37]' : 'text-white/20'}`}>
                                 {step.label}
                               </p>
                               <p className={`text-[8px] mt-0.5 ${done ? 'text-white/40' : 'text-white/15'}`}>
@@ -252,7 +252,7 @@ const OrderCard = ({ order, index }: { order: Order; index: number }) => {
 
               {/* Articles */}
               <div>
-                <p className="text-[9px] text-white/30 uppercase tracking-[0.25em] mb-4">Articles</p>
+                <p className="text-[10px] text-white/30 uppercase tracking-[0.25em] mb-4">Articles</p>
                 <div className="space-y-3">
                   {order.items.map((item, j) => (
                     <div key={`${item.productId}-${j}`} className="flex items-center justify-between gap-4">

@@ -216,7 +216,7 @@ const Footer = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Votre email"
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-white/10 transition-colors duration-300"
+                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white text-base md:text-sm placeholder:text-white/25 focus:outline-none focus:border-[#D4AF37]/50 focus:bg-white/10 transition-colors duration-300"
               />
               
               {/* BOUTON S'INSCRIRE LUXE */}
@@ -271,16 +271,16 @@ const Footer = () => {
             Découvrez des fragrances d'exception qui racontent votre histoire.
           </p>
           <motion.div
-            className="flex flex-wrap items-center gap-6"
+            className="flex flex-wrap items-center gap-1"
             variants={fadeInVariants}
           >
-            <a href="#" className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white/60 transition-colors">
+            <a href="#" className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white/60 transition-colors min-h-[44px] flex items-center px-3">
               Mentions légales
             </a>
-            <a href="#" className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white/60 transition-colors">
+            <a href="#" className="text-[10px] uppercase tracking-[0.2em] text-white/30 hover:text-white/60 transition-colors min-h-[44px] flex items-center px-3">
               Confidentialité
             </a>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-white/20">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-white/20 min-h-[44px] flex items-center px-3">
               © 2026 Rayha Store
             </span>
           </motion.div>

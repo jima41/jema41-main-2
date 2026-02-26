@@ -158,7 +158,7 @@ const ProductCard = ({
             e.stopPropagation();
             handleToggleFavorite(e);
           }}
-          className="absolute top-2.5 right-2.5 p-2 rounded-full bg-black/35 backdrop-blur-sm z-30 active:scale-95"
+          className="absolute top-1.5 right-1.5 p-3 rounded-full bg-black/35 backdrop-blur-sm z-30 active:scale-95"
           whileHover={{ scale: 1.12 }}
           whileTap={{ scale: 0.88 }}
           transition={{ type: 'spring', stiffness: 400, damping: 30 }}
@@ -174,7 +174,7 @@ const ProductCard = ({
 
         {/* Stock limité badge */}
         {!isOutOfStock && stock > 0 && stock < 5 && (
-          <span className="absolute bottom-3 left-3 text-[9px] uppercase tracking-[0.2em] text-amber-400 font-medium bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded-full z-10">
+          <span className="absolute bottom-3 left-3 text-[10px] uppercase tracking-[0.15em] text-amber-400 font-medium bg-black/50 backdrop-blur-sm px-2 py-1 rounded-full z-10">
             Stock limité
           </span>
         )}
@@ -200,7 +200,7 @@ const ProductCard = ({
         {/* Brand + Name + Price row */}
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="text-[9px] md:text-[10px] font-medium text-[#A68A56] uppercase tracking-[0.18em] mb-0.5 truncate">
+            <p className="text-[10px] font-medium text-[#A68A56] uppercase tracking-[0.15em] mb-0.5 truncate">
               {brand}
             </p>
             <h3 className="text-white font-medium text-xs md:text-sm leading-tight line-clamp-1">
@@ -216,7 +216,7 @@ const ProductCard = ({
         </div>
 
         {/* Scent / family line */}
-        <p className="text-[10px] md:text-[11px] text-[#888888] italic leading-snug line-clamp-1">
+        <p className="text-[11px] text-[#888888] italic leading-snug line-clamp-1">
           {scentLine}
         </p>
 
@@ -225,12 +225,12 @@ const ProductCard = ({
 
         {/* CTA row */}
         {isOutOfStock ? (
-          <p className="text-center text-[9px] tracking-[0.25em] uppercase font-serif text-[#D4AF37]/70 py-0.5">
+          <p className="text-center text-[10px] tracking-[0.2em] uppercase font-serif text-[#D4AF37]/70 py-0.5">
             Édition épuisée
           </p>
         ) : (
           <div className="flex items-center justify-center gap-1 py-0.5">
-            <span className="text-[10px] md:text-[11px] font-medium uppercase tracking-[0.22em] text-white/60 group-hover:text-white/90 transition-colors duration-300">
+            <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/60 group-hover:text-white/90 transition-colors duration-300">
               Découvrir
             </span>
             <svg

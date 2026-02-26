@@ -178,7 +178,7 @@ const Hero = () => {
           {/* Description */}
           <motion.p
             variants={blurRevealVariants}
-            className="text-[12px] sm:text-lg font-light leading-relaxed text-gray-800 mb-6 sm:mb-12 max-w-[280px] sm:max-w-md"
+            className="text-[12px] sm:text-lg font-light leading-relaxed text-gray-800 mb-6 sm:mb-12 max-w-[85vw] sm:max-w-md"
           >
             Une signature olfactive unique, conçue pour ceux qui cherchent l'exceptionnel.
           </motion.p>

@@ -53,7 +53,7 @@ interface ActionIconProps {
 const ActionIcon = ({ icon, onClick, badge, title, isActive }: ActionIconProps) => {
   return (
     <motion.button
-      className={`p-2 rounded-full transition-all duration-200 relative ${
+      className={`p-2.5 rounded-full transition-all duration-200 relative ${
         isActive ? 'bg-white/10' : 'hover:bg-white/10'
       }`}
       onClick={onClick}

@@ -134,7 +134,7 @@ const Success = () => {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: silkyEase }}
-            className="bg-[#0E0E0E] rounded-2xl md:rounded-[2rem] shadow-2xl overflow-hidden border border-[#D4AF37]/20 p-8 md:p-16 relative"
+            className="bg-[#0E0E0E] rounded-2xl md:rounded-[2rem] shadow-2xl overflow-hidden border border-[#D4AF37]/20 p-5 sm:p-8 md:p-12 relative"
           >
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-[#D4AF37]/10 blur-[100px] rounded-full pointer-events-none" />
 
@@ -142,7 +142,7 @@ const Success = () => {
 
               {/* Icône succès */}
               <motion.div
-                className="mb-8 mx-auto flex items-center justify-center w-20 h-20 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/5 text-[#D4AF37]"
+                className="mb-6 mx-auto flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/5 text-[#D4AF37]"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.2, type: 'spring' }}
@@ -161,24 +161,24 @@ const Success = () => {
               </p>
 
               {/* Récapitulatif */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-0 p-8 rounded-xl bg-white/5 border border-white/10 mb-10">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-0 p-5 sm:p-8 rounded-xl bg-white/5 border border-white/10 mb-8 md:mb-10">
                 <div className="md:border-r md:border-white/10 flex flex-col items-center justify-center">
-                  <p className="text-[9px] text-white/40 uppercase tracking-[0.2em] mb-2">Référence privée</p>
+                  <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] mb-2">Référence privée</p>
                   <p className="font-serif text-xl text-[#D4AF37] tracking-wider">{orderRef}</p>
                 </div>
                 <div className="md:border-r md:border-white/10 flex flex-col items-center justify-center">
-                  <p className="text-[9px] text-white/40 uppercase tracking-[0.2em] mb-2">Créations</p>
+                  <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] mb-2">Créations</p>
                   <p className="font-serif text-xl text-white">{totalItems}</p>
                 </div>
                 <div className="flex flex-col items-center justify-center">
-                  <p className="text-[9px] text-white/40 uppercase tracking-[0.2em] mb-2">Valeur totale</p>
+                  <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] mb-2">Valeur totale</p>
                   <p className="font-serif text-xl text-white">{total.toFixed(2)} €</p>
                 </div>
               </div>
 
               {/* Liste des produits */}
               <div className="mb-10 text-left">
-                <p className="text-[9px] text-white/40 uppercase tracking-[0.2em] mb-4 text-center">Vos créations</p>
+                <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] mb-4 text-center">Vos créations</p>
                 <div className="space-y-3">
                   {items.map((item) => (
                     <div key={item.id} className="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/10">

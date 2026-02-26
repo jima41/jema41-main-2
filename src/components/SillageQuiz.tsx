@@ -244,7 +244,7 @@ const DiagnosticRitual = () => {
   return (
     <div className="w-full flex justify-center px-4 md:px-6 my-12 md:my-16 selection:bg-[#D4AF37] selection:text-black">
       {/* Conteneur de taille fixe unifiée : h-[500px] partout pour un rendu massif, sans scroll */}
-      <div className="relative w-full max-w-4xl bg-[#050505] h-[500px] rounded-sm overflow-hidden border border-white/5 shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
+      <div className="relative w-full max-w-4xl bg-[#050505] min-h-[500px] md:h-[500px] rounded-sm overflow-hidden border border-white/5 shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
         
         <AnimatePresence mode="wait">
             
@@ -261,7 +261,7 @@ const DiagnosticRitual = () => {
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-[#D4AF37]/5 blur-[100px] rounded-full pointer-events-none" />
                     
                     <div className="relative z-10 space-y-4 md:space-y-6 flex flex-col items-center max-w-lg mx-auto">
-                        <span className="text-[9px] font-bold tracking-[0.4em] text-[#A68A56] uppercase block">
+                        <span className="text-[10px] font-bold tracking-[0.35em] text-[#A68A56] uppercase block">
                             Rituel de Signature
                         </span>
                         
@@ -321,9 +321,9 @@ const DiagnosticRitual = () => {
                                 <button
                                   key={option.value}
                                   onClick={() => handleAnswer(option.value)}
-                                  className="group bg-[#050505] p-4 md:p-6 text-center transition-all duration-500 hover:bg-[#D4AF37]/5 active:bg-[#D4AF37]/10"
+                                  className="group bg-[#050505] p-4 md:p-6 min-h-[52px] text-center transition-all duration-500 hover:bg-[#D4AF37]/5 active:bg-[#D4AF37]/10 flex items-center justify-center"
                                 >
-                                  <span className="block text-xs md:text-sm text-white/50 group-hover:text-white font-serif tracking-[0.1em] transition-colors duration-500">
+                                  <span className="block text-sm text-white/50 group-hover:text-white font-serif tracking-[0.1em] transition-colors duration-500">
                                     {option.label}
                                   </span>
                                 </button>
