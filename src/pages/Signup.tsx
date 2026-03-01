@@ -110,6 +110,12 @@ const Signup = () => {
     setIsLoading(true);
     try {
       await signup(trimUser, trimEmail, password);
+      // Envoi email de bienvenue (fire-and-forget)
+      fetch('/api/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: trimEmail }),
+      }).catch(() => {});
       navigate('/'); // inscription directe (email confirmation désactivé côté Supabase)
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur lors de l'inscription";
