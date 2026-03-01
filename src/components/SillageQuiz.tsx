@@ -13,6 +13,12 @@ import type { OlfactoryFamily } from '@/lib/olfactory';
 
 type Step = 'intro' | 'quiz' | 'loading' | 'results';
 
+const CONCENTRATION_LABELS: Record<string, string> = {
+  EX: 'Extrait de Parfum',
+  EDP: 'Eau de Parfum',
+  EDT: 'Eau de Toilette',
+};
+
 const QUESTIONS = [
   {
     id: 1,
@@ -395,9 +401,9 @@ const DiagnosticRitual = () => {
                                 <p className="text-[10px] text-white/40 uppercase tracking-[0.2em]">
                                     Par {perfectMatch.brand}
                                 </p>
-                                {perfectMatch.category && (
-                                    <span className="text-[10px] text-white/30 uppercase tracking-[0.15em] border border-white/10 px-2 py-0.5 rounded-sm inline-block mt-1 whitespace-normal">
-                                        {perfectMatch.category}
+                                {(perfectMatch.category || perfectMatch.concentration) && (
+                                    <span className="text-[10px] text-white/30 uppercase tracking-[0.15em] border border-white/10 px-2 py-0.5 rounded-sm inline-block mt-1">
+                                        {CONCENTRATION_LABELS[perfectMatch.category || perfectMatch.concentration || ''] || perfectMatch.category || perfectMatch.concentration}
                                     </span>
                                 )}
                             </div>
