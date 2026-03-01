@@ -77,26 +77,8 @@ const AllProducts = () => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const { user } = useAuth();
 
-  const ACTIVE_FAMILY_KEY = 'rayha_active_family';
-
-  // Load persisted family on mount
+  // Sync active family to Supabase for authenticated users (scent profile)
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(ACTIVE_FAMILY_KEY);
-      if (stored && activeFamilies.length === 0) {
-        setActiveFamilies([stored as OlfactoryFamily]);
-      }
-    } catch { /* ignore */ }
-  }, []);
-
-  // Persist on change and sync to Supabase for authenticated users
-  useEffect(() => {
-    try {
-      if (activeFamilies.length > 0) {
-        localStorage.setItem(ACTIVE_FAMILY_KEY, activeFamilies[0]);
-      }
-    } catch { /* ignore */ }
-
     if (user?.id && activeFamilies.length > 0) {
       upsertUserScentProfile(user.id, { primary_family: activeFamilies[0] }).catch((err) => {
         console.error('❌ Erreur sauvegarde primary_family:', err);
