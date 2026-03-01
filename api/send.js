@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+const { Resend } = require('resend');
+
 const emailHtml = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
@@ -30,17 +33,21 @@ module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
 
   if (req.method !== 'POST') {
-    return res.status(405).end(JSON.stringify({ error: 'Method not allowed' }));
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const { email } = req.body || {};
   if (!email) {
-    return res.status(400).end(JSON.stringify({ error: 'Email is required' }));
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: 'RESEND_API_KEY not configured' });
   }
 
   try {
-    const { Resend } = await import('resend');
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const resend = new Resend(apiKey);
 
     const { data, error } = await resend.emails.send({
       from: 'Rayha Store <conciergerie@rayhastore.com>',
@@ -50,12 +57,11 @@ module.exports = async function handler(req, res) {
     });
 
     if (error) {
-      return res.status(400).end(JSON.stringify({ error }));
+      return res.status(400).json({ error: { message: error.message, name: error.name } });
     }
 
-    return res.status(200).end(JSON.stringify({ success: true, data }));
+    return res.status(200).json({ success: true, id: data?.id });
   } catch (err) {
-    console.error('Send error:', err);
-    return res.status(500).end(JSON.stringify({ error: String(err) }));
+    return res.status(500).json({ error: String(err) });
   }
 };
