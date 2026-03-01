@@ -378,12 +378,29 @@ const DiagnosticRitual = () => {
                                 Votre Signature Olfactive
                             </span>
                             
-                            <h2 className="font-serif text-2xl md:text-4xl lg:text-5xl text-white mb-1 md:mb-2 leading-tight">
-                                {perfectMatch.name}
-                            </h2>
-                            <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] mb-3 md:mb-6">
-                                Par {perfectMatch.brand}
-                            </p>
+                            {/* Nom + Contenance à droite */}
+                            <div className="flex items-baseline gap-3 mb-1 md:mb-2">
+                                <h2 className="font-serif text-2xl md:text-4xl lg:text-5xl text-white leading-tight">
+                                    {perfectMatch.name}
+                                </h2>
+                                {perfectMatch.volume && (
+                                    <span className="text-sm text-white/35 italic font-light flex-shrink-0">
+                                        {perfectMatch.volume}
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Marque + Type de parfum en dessous */}
+                            <div className="mb-3 md:mb-6">
+                                <p className="text-[10px] text-white/40 uppercase tracking-[0.2em]">
+                                    Par {perfectMatch.brand}
+                                </p>
+                                {perfectMatch.category && (
+                                    <span className="text-[10px] text-white/30 uppercase tracking-[0.15em] border border-white/10 px-2 py-0.5 rounded-sm inline-block mt-1">
+                                        {perfectMatch.category}
+                                    </span>
+                                )}
+                            </div>
 
                             <div className="h-px w-12 bg-white/10 mb-3 md:mb-6" />
 
@@ -391,7 +408,7 @@ const DiagnosticRitual = () => {
                                 <p className="font-serif text-sm text-white/80 leading-relaxed line-clamp-2 md:line-clamp-3">
                                     {perfectMatch.scent}
                                 </p>
-                                
+
                                 {perfectMatch.families && perfectMatch.families.length > 0 && (
                                     <div className="pt-1">
                                         <p className="text-[8px] uppercase tracking-widest text-[#D4AF37] mb-1">Famille Olfactive</p>
@@ -399,23 +416,10 @@ const DiagnosticRitual = () => {
                                     </div>
                                 )}
 
-                                <div className="pt-1 flex flex-row flex-wrap gap-x-5 gap-y-2">
-                                    <div>
-                                        <p className="text-[8px] uppercase tracking-widest text-[#D4AF37] mb-1">Prix</p>
-                                        <p className="text-xs text-white/60 font-light">{perfectMatch.price.toFixed(2)} €</p>
-                                    </div>
-                                    {perfectMatch.volume && (
-                                        <div>
-                                            <p className="text-[8px] uppercase tracking-widest text-[#D4AF37] mb-1">Contenance</p>
-                                            <p className="text-xs text-white/60 font-light">{perfectMatch.volume}</p>
-                                        </div>
-                                    )}
-                                    {perfectMatch.category && (
-                                        <div>
-                                            <p className="text-[8px] uppercase tracking-widest text-[#D4AF37] mb-1">Type</p>
-                                            <p className="text-xs text-white/60 font-light">{perfectMatch.category}</p>
-                                        </div>
-                                    )}
+                                {/* Prix en dessous des familles olfactives */}
+                                <div className="pt-1">
+                                    <p className="text-[8px] uppercase tracking-widest text-[#D4AF37] mb-1">Prix</p>
+                                    <p className="text-xs text-white/60 font-light">{perfectMatch.price.toFixed(2)} €</p>
                                 </div>
                             </div>
 
