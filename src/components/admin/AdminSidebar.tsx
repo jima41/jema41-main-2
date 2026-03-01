@@ -171,6 +171,26 @@ const AdminSidebar = ({ onItemClick }: AdminSidebarProps) => {
 
       {/* Footer */}
       <div className="border-t border-admin-border p-4 space-y-2">
+        <button
+          onClick={async () => {
+            try {
+              const response = await fetch('/api/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: 'boujemaoui.hamza@gmail.com' }),
+              });
+              const result = await response.json();
+              console.log(result);
+              alert('Vérifie ta boîte mail !');
+            } catch (error) {
+              console.error("Erreur de test :", error);
+            }
+          }}
+          className="w-full py-2 px-3 text-sm rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors duration-200 border border-white/10 hover:border-white/20 text-center truncate"
+          title="Envoyer un mail de test"
+        >
+          {isCollapsed ? '✉' : '🚀 Mail de test'}
+        </button>
         <button className="w-full py-2 px-3 text-sm rounded-lg bg-admin-gold/10 hover:bg-admin-gold/20 text-admin-gold transition-colors duration-200 border border-admin-gold/30 hover:border-admin-gold/50 text-center truncate">
           {isCollapsed ? '?' : 'Besoin d\'aide ?'}
         </button>
