@@ -398,6 +398,25 @@ const DiagnosticRitual = () => {
                                         <p className="text-xs text-white/60 font-light">{perfectMatch.families.join(' • ')}</p>
                                     </div>
                                 )}
+
+                                <div className="pt-1 flex flex-row flex-wrap gap-x-5 gap-y-2">
+                                    <div>
+                                        <p className="text-[8px] uppercase tracking-widest text-[#D4AF37] mb-1">Prix</p>
+                                        <p className="text-xs text-white/60 font-light">{perfectMatch.price.toFixed(2)} €</p>
+                                    </div>
+                                    {perfectMatch.volume && (
+                                        <div>
+                                            <p className="text-[8px] uppercase tracking-widest text-[#D4AF37] mb-1">Contenance</p>
+                                            <p className="text-xs text-white/60 font-light">{perfectMatch.volume}</p>
+                                        </div>
+                                    )}
+                                    {perfectMatch.category && (
+                                        <div>
+                                            <p className="text-[8px] uppercase tracking-widest text-[#D4AF37] mb-1">Type</p>
+                                            <p className="text-xs text-white/60 font-light">{perfectMatch.category}</p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
                             {/* Conteneur des Boutons */}

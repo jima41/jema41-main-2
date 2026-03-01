@@ -89,13 +89,13 @@ export const SimpleOlfactoryDisplay: React.FC<SimpleOlfactoryDisplayProps> = ({
                   >
                     Notes de {step.label}
                   </p>
-                  <span className="text-[9px] font-light tracking-[0.1em] text-foreground/50">
+                  <span className="text-[9px] font-light tracking-[0.1em] text-[#1a1a1a]">
                     · {step.duration}
                   </span>
                 </div>
 
                 {/* Notes inline séparées par des points médians */}
-                <p className="text-[11px] text-foreground/70 font-light leading-relaxed">
+                <p className="text-[11px] text-[#1a1a1a] font-light leading-relaxed">
                   {notes.map(getNoteLabel).join(' · ')}
                 </p>
               </div>
@@ -120,10 +120,10 @@ export const SimpleOlfactoryDisplay: React.FC<SimpleOlfactoryDisplayProps> = ({
               >
                 Notes de {step.label}
               </p>
-              <p className="text-[9px] font-light text-foreground/35 tracking-[0.1em] mb-2.5">
+              <p className="text-[9px] font-light text-[#1a1a1a] tracking-[0.1em] mb-2.5">
                 {step.duration}
               </p>
-              <p className="text-xs text-foreground/60 font-light leading-relaxed">
+              <p className="text-xs text-[#1a1a1a] font-light leading-relaxed">
                 {notes.map(getNoteLabel).join(' · ')}
               </p>
             </div>
