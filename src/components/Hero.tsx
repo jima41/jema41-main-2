@@ -108,28 +108,38 @@ const Hero = () => {
       onMouseLeave={handleMouseLeave}
     >
       {/* Background Image (Responsive) */}
-      <motion.div
-        className="absolute inset-0 w-full h-full z-0 md:scale-[1.03]"
-        style={isMobile ? { mixBlendMode: 'multiply' } : {
-          x: springX,
-          y: springY,
-          mixBlendMode: 'multiply'
-        }}
-      >
-        <picture>
-          {/* Image chargée uniquement sur mobile (écrans < 768px) */}
-          <source media="(max-width: 767px)" srcSet="/images/Hero-section-mobile.webp" />
-          {/* Image par défaut (Desktop/Tablette) */}
+      {isMobile ? (
+        <div
+          className="absolute inset-0 w-full h-full z-0"
+          style={{ mixBlendMode: 'multiply' }}
+        >
           <img
-            src="/images/Hero-section.webp"
+            src="/images/Hero-section-mobile.webp"
             alt="Collection Parfum Rayha"
-            className="w-full h-full object-cover object-[100%_50%] md:object-center"
+            className="w-full h-full object-cover object-center"
             loading="eager"
             fetchPriority="high"
             decoding="sync"
           />
-        </picture>
-      </motion.div>
+        </div>
+      ) : (
+        <motion.div
+          className="absolute inset-0 w-full h-full z-0 md:scale-[1.03]"
+          style={{ x: springX, y: springY, mixBlendMode: 'multiply' }}
+        >
+          <picture>
+            <source media="(max-width: 767px)" srcSet="/images/Hero-section-mobile.webp" />
+            <img
+              src="/images/Hero-section.webp"
+              alt="Collection Parfum Rayha"
+              className="w-full h-full object-cover object-[100%_50%] md:object-center"
+              loading="eager"
+              fetchPriority="high"
+              decoding="sync"
+            />
+          </picture>
+        </motion.div>
+      )}
 
       {/* MODIFICATION ICI : Le dégradé part du HAUT (bg-gradient-to-b) sur mobile pour protéger le texte, 
           puis repart de la gauche (bg-gradient-to-r) sur Desktop */}
