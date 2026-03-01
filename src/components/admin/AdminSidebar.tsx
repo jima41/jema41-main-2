@@ -179,8 +179,12 @@ const AdminSidebar = ({ onItemClick }: AdminSidebarProps) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: 'boujemaoui.hamza@gmail.com' }),
               });
-              const text = await response.text();
-              alert(`Status: ${response.status}\nBody: ${text.slice(0, 300)}`);
+              const data = await response.json();
+              if (data.success) {
+                alert('✅ Mail envoyé ! Vérifie ta boîte.');
+              } else {
+                alert('❌ Erreur : ' + JSON.stringify(data.error));
+              }
 
             } catch (error) {
               alert('❌ Erreur réseau : ' + String(error));
