@@ -14,9 +14,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Montserrat', 'system-ui', 'sans-serif'],
-        serif: ['Cormorant Garamond', 'serif'],
-        montserrat: ['Montserrat', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        serif: ['Inter', 'system-ui', 'sans-serif'],
+        montserrat: ['Inter', 'sans-serif'],
+        display: ['Cormorant Garamond', 'serif'],
       },
       colors: {
         // Admin dark theme

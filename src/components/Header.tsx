@@ -29,7 +29,7 @@ interface HeaderProps {
 const Logo = () => {
   return (
     <Link to="/" className="flex items-center gap-0 group">
-      <span className="font-serif text-2xl md:text-3xl font-normal tracking-widest text-white">
+      <span className="font-display text-2xl md:text-3xl font-normal tracking-widest text-white">
         Rayha
       </span>
       <span className="font-sans text-xs font-light tracking-widest text-white/70 uppercase ml-1 pt-1">
