@@ -396,7 +396,7 @@ const DiagnosticRitual = () => {
                                     Par {perfectMatch.brand}
                                 </p>
                                 {perfectMatch.category && (
-                                    <span className="text-[10px] text-white/30 uppercase tracking-[0.15em] border border-white/10 px-2 py-0.5 rounded-sm inline-block mt-1">
+                                    <span className="text-[10px] text-white/30 uppercase tracking-[0.15em] border border-white/10 px-2 py-0.5 rounded-sm inline-block mt-1 whitespace-normal">
                                         {perfectMatch.category}
                                     </span>
                                 )}
@@ -418,8 +418,9 @@ const DiagnosticRitual = () => {
 
                                 {/* Prix en dessous des familles olfactives */}
                                 <div className="pt-1">
-                                    <p className="text-[8px] uppercase tracking-widest text-[#D4AF37] mb-1">Prix</p>
-                                    <p className="text-xs text-white/60 font-light">{perfectMatch.price.toFixed(2)} €</p>
+                                    <span className="text-2xl lg:text-3xl font-sans font-medium tracking-wide text-white tabular-nums">
+                                        {perfectMatch.price.toFixed(2)} €
+                                    </span>
                                 </div>
                             </div>
 
