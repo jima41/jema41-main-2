@@ -46,7 +46,7 @@ const fadeUpItem = {
 
 const AllProducts = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     cartItems,
     isCartOpen,
@@ -65,15 +65,22 @@ const AllProducts = () => {
   const { products: storeProducts } = useAdminStore();
   const { toast } = useToast();
   
-  // Get family from query params
-  const familyFromUrl = searchParams.get('family');
-  
   // Multi-select : tableaux vides = "tous" (aucun filtre actif)
+  // Toujours démarrer vide — les filtres ne persistent jamais entre les pages
   const [activeCategories, setActiveCategories] = useState<string[]>([]);
-  const [activeFamilies, setActiveFamilies] = useState<OlfactoryFamily[]>(
-    familyFromUrl ? [familyFromUrl as OlfactoryFamily] : []
-  );
+  const [activeFamilies, setActiveFamilies] = useState<OlfactoryFamily[]>([]);
   const [activeBrands, setActiveBrands] = useState<string[]>([]);
+
+  // Initialisation ponctuelle depuis le param URL ?family= (ex: depuis le SillageQuiz)
+  // On efface ensuite le param pour que refresh/retour navigateur ne le restaure pas
+  useEffect(() => {
+    const family = searchParams.get('family');
+    if (family) {
+      setActiveFamilies([family as OlfactoryFamily]);
+      setSearchParams({}, { replace: true });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const { user } = useAuth();
 
