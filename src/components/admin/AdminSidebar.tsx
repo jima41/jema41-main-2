@@ -181,8 +181,13 @@ const AdminSidebar = ({ onItemClick }: AdminSidebarProps) => {
               });
               const result = await response.json();
               console.log(result);
-              alert('Vérifie ta boîte mail !');
+              if (result.success) {
+                alert('✅ Mail envoyé ! Vérifie ta boîte.');
+              } else {
+                alert('❌ Erreur : ' + JSON.stringify(result.error));
+              }
             } catch (error) {
+              alert('❌ Erreur réseau : ' + String(error));
               console.error("Erreur de test :", error);
             }
           }}

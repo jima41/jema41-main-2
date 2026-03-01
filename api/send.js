@@ -45,7 +45,7 @@ module.exports = async function handler(req, res) {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Rayha Store <conciergerie@rayha.store>',
+      from: 'Rayha Store <onboarding@resend.dev>',
       to: email,
       subject: 'Test — Rayha Store',
       html: emailHtml,
