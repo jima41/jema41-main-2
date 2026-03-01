@@ -110,10 +110,12 @@ const LayeringGuide = () => {
       category: 'duo',
     });
 
-    toast({
-      title: 'Duo ajouté au panier',
-      description: `"${duo.name}" — ${duo.productA.name} + ${duo.productB.name}`,
-    });
+    if (window.innerWidth >= 768) {
+      toast({
+        title: 'Duo ajouté au panier',
+        description: `"${duo.name}" — ${duo.productA.name} + ${duo.productB.name}`,
+      });
+    }
     setIsCartOpen(true);
   };
 
@@ -154,10 +156,12 @@ const LayeringGuide = () => {
       scent: duoMeta,
       category: 'duo',
     });
-    toast({
-      title: 'Accord personnalisé ajouté',
-      description: `${suggestedA.name} + ${suggestedB.name}`,
-    });
+    if (window.innerWidth >= 768) {
+      toast({
+        title: 'Accord personnalisé ajouté',
+        description: `${suggestedA.name} + ${suggestedB.name}`,
+      });
+    }
     setIsCartOpen(true);
   };
 

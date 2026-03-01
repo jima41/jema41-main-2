@@ -110,10 +110,10 @@ const Hero = () => {
       {/* Background Image (Responsive) */}
       <motion.div
         className="absolute inset-0 w-full h-full z-0 md:scale-[1.03]"
-        style={{ 
-          x: springX, 
+        style={isMobile ? { mixBlendMode: 'multiply' } : {
+          x: springX,
           y: springY,
-          mixBlendMode: 'multiply' 
+          mixBlendMode: 'multiply'
         }}
       >
         <picture>

@@ -228,20 +228,24 @@ const ProductDetail = () => {
     const { description, notes, volume, ...productData } = product;
     addToCart(productData as any, quantity);
     setQuantity(1);
-    toast({
-      title: 'Ajouté au panier',
-      description: `${quantity}x ${product.name}`,
-    });
+    if (window.innerWidth >= 768) {
+      toast({
+        title: 'Ajouté au panier',
+        description: `${quantity}x ${product.name}`,
+      });
+    }
   };
 
   const handleToggleFavorite = () => {
     if (id && user?.id) {
       toggleFavorite(user.id, id);
       setIsFav(!isFav);
-      toast({
-        title: isFav ? 'Retiré de vos coups de cœur' : 'Ajouté à vos coups de cœur',
-        description: product.name,
-      });
+      if (window.innerWidth >= 768) {
+        toast({
+          title: isFav ? 'Retiré de vos coups de cœur' : 'Ajouté à vos coups de cœur',
+          description: product.name,
+        });
+      }
     }
   };
 
@@ -592,7 +596,7 @@ const ProductDetail = () => {
                                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                     const { description, notes, volume, ...productData } = relatedProduct;
                                     addToCart(productData as any, 1);
-                                    toast({ title: 'Ajouté au panier', description: relatedProduct.name });
+                                    if (window.innerWidth >= 768) toast({ title: 'Ajouté au panier', description: relatedProduct.name });
                                   }}
                                   className="p-2.5 md:p-3 rounded-full border border-white/30 bg-black/40 backdrop-blur-sm text-white hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors shadow-lg"
                                   whileHover={{ scale: 1.1, y: -2 }}
